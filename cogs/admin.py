@@ -8,7 +8,6 @@ class Admin(commands.Cog):
         self.bot: botcore.Bot = bot
 
     @commands.command(name='reload', hidden=True)
-    @commands.is_owner()
     async def reload_cog(self, ctx: commands.Context, cog: str):
         """Attempts to reload a cog"""
 
@@ -27,7 +26,6 @@ class Admin(commands.Cog):
             await ctx.send(f'{cog} has no setup function.')
 
     @commands.command(name='load', hidden=True)
-    @commands.is_owner()
     async def load_cog(self, ctx: commands.Context, cog: str):
         """Attempts to load a cog"""
 
@@ -44,7 +42,6 @@ class Admin(commands.Cog):
             await ctx.send(f'{cog} has no setup function.')
 
     @commands.command(name='unload', hidden=True)
-    @commands.is_owner()
     async def unload_cog(self, ctx: commands.Context, cog: str):
         """Attempts to unload a cog"""
 
@@ -55,6 +52,11 @@ class Admin(commands.Cog):
             await ctx.send(f'{cog} unloaded successfully.')
         except commands.ExtensionNotLoaded:
             await ctx.send(f'{cog} not loaded.')
+
+    def cog_check(self, ctx):
+        """This deals with bot systems, so only the owner should use these commands"""
+
+        return self.bot.is_owner(ctx.author)
 
 def setup(bot):
     bot.add_cog(Admin(bot))
