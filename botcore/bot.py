@@ -76,10 +76,6 @@ class Bot(commands.Bot):
             The event method's name that caused the exception.
         """
 
-
-        print(args)
-        print([*kwargs])
-
         error_message = args[0]
 
         print(f'Unhandled exception caused by event: {event}' \
