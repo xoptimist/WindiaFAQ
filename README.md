@@ -1,4 +1,4 @@
 # WindiaFAQ
-A bot used for helping users of Windia's Discord Server
+A bot used for helping users of Windia's Discord Server.
 
-This is a very specific piece of software and is just posted for viewing
+This upload is for viewing purposes only and is not meant to be used.
