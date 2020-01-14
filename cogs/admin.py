@@ -2,7 +2,28 @@ from discord.ext import tasks, commands
 import botcore
 
 class Admin(commands.Cog):
-    """A cog to do admin errands such as loading/unloading other cogs"""
+    """A cog to do admin errands such as loading/unloading other cogs
+    
+    Methods
+    -------
+    async def reload_cog(self, ctx: commands.Context, cog: str):
+        Attempts to reload a cog
+
+    async def reload_cog(self, ctx: commands.Context, cog: str):
+        Attempts to reload a cog
+
+    async def load_cog(self, ctx: commands.Context, cog: str):
+        Attempts to load a cog
+
+    async def unload_cog(self, ctx: commands.Context, cog: str):
+        Attempts to unload a cog
+
+    async def logout(self, ctx: commands.Context):
+        Attempts to logout of discord
+
+    def cog_check(self, ctx: commands.Context):
+        Checks if the user attempting to invoke any admin commands is the owner of the bot
+    """
 
     def __init__(self, bot: botcore.Bot):
         """The constructor for the Admin cog
