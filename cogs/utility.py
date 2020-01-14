@@ -23,7 +23,7 @@ class Utility(commands.Cog):
         self.bot: botcore.Bot = bot
 
     @commands.command(name='id', description='Gets the user\'s Discord ID')
-    async def get_id(self, ctx: commands.Context, *, member: discord.Member = None):
+    async def get_id(self, ctx: commands.Context, member: discord.Member = None):
         """Tells a user their Discord ID
         
         await get_id(ctx: discord.ext.commands.Context[, *, member: discord.Member = None])
