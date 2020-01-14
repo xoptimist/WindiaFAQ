@@ -16,7 +16,7 @@ load_dotenv()
 
 cogs_path = './cogs'
 cogs = [ f'cogs.{file[:-3]}' for file in os.listdir(cogs_path) if file.endswith('.py') ]
-bot = Bot('~')
+bot = Bot(os.getenv('PREFIX'))
 
 for cog in cogs:
     try:
