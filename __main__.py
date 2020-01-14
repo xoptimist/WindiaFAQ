@@ -1,3 +1,11 @@
+"""This file serves as the entry point for WindiaFAQ
+
+This file loads the environment variables from the .env file,
+then loads the cogs used for the command modules for the WindiaFAQ
+Discord Bot, then runs the WindiaFAQ Bot using the Token stored in 
+the .env file.
+"""
+
 from botcore import Bot
 from dotenv import load_dotenv
 import os

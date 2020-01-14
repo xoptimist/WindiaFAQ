@@ -1,5 +1,16 @@
-"""This file is for saving and loading commands for the Windia FAQ
-This was put in a separate file to reduce clutter"""
+"""This file is for saving and loading FAQ commands for the Windia FAQ
+
+Methods
+-------
+def load_commands() -> dict
+    Attempts to load commands stored in commands.json, else loads a dictionary of default commands
+
+def save_commands(commands: dict)
+    Saves the commands to the commands file
+
+load_default_commands() -> dict
+    Returns a dictionary of default commands
+"""
 
 import os.path
 import json
@@ -7,8 +18,16 @@ import json
 commands_file = 'commands.json'
 
 def load_commands() -> dict:
-    """Returns the commands stored in the commands.json or a dictionary of default commands"""
+    """Attempts to load commands stored in commands.json, else loads a dictionary of default commands
+    
+    Checks if the commands file exists; if it does, then the commands are loaded
+    from the commands file, else it is loaded from the default commands.
 
+    Returns
+    -------
+    A dictionary of FAQ commands
+    """
+    
     if not os.path.exists(commands_file):
         return load_default_commands()
     else:
@@ -16,13 +35,42 @@ def load_commands() -> dict:
             return json.load(file)
 
 def save_commands(commands: dict):
-    """Saves the commands to the commands file"""
+    """Saves the commands to the commands file
+    
+    save_commands(commands: dict)
+
+    Opens the commands_file in write-mode, then dumps the commands dictionary into the file.
+
+    Parameters
+    ----------
+    commands: dict
+        The commands being stored into the commands file
+
+    Raises
+    ------
+    TypeError
+        If the commands passed is not of type dict
+    """
+
+    if not isinstance(commands, dict):
+        raise TypeError
 
     with open(commands_file, 'w') as file:
-        json.dump(commands, file, indent = 4)
+        json.dump(commands, file, indent=4)
         
 def load_default_commands() -> dict:
-    """A dictionary of default commands"""
+    """A dictionary of default commands
+    
+    load_default_commands() -> dict
+    
+    A dictionary of some default commands used. This is used when no commands file
+    is found when loading commands, so these commands are then saved into the 
+    commands file.
+
+    Returns
+    -------
+    A dictionary of default commands
+    """
 
     default_commands = {
         'rates': 'Levels 1-9: 1x\n' \
