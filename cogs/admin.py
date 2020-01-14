@@ -115,6 +115,26 @@ class Admin(commands.Cog):
         except commands.ExtensionNotLoaded:
             await ctx.send(f'{cog} not loaded.')
 
+    @commands.command(name='logout', hidden=True)
+    async def logout(self, ctx: commands.Context):
+        """Attempts to logout of discord
+        
+        await logout(ctx: discord.ext.commands.Context)
+
+        This is a coroutine. This is not called directly; it is called whenever
+        a user attempts to use the `$logout` command. If this command passes the
+        cog check, the bot will log out.
+
+        Parameters
+        ----------
+        ctx: discord.ext.commands.Context
+            The context in which the command was sent
+        """
+
+        await ctx.send('Goodbye!')
+        await self.bot.logout()
+        sys.exit()
+
     def cog_check(self, ctx: commands.Context):
         """Checks if the user attempting to invoke any admin commands is the owner of the bot
         
