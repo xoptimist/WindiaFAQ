@@ -1,5 +1,6 @@
 from discord.ext import tasks, commands
 import botcore
+import traceback
 
 class Admin(commands.Cog):
     """A cog to do admin errands such as loading/unloading other cogs
@@ -76,6 +77,9 @@ class Admin(commands.Cog):
             await ctx.send(f'{cog} not found.')
         except commands.NoEntryPointError:
             await ctx.send(f'{cog} has no setup function.')
+        except:
+            print(f'An unhandled error was thrown while loading {cog}')
+            traceback.print_exc()
 
     @commands.command(name='load', hidden=True)
     async def load_cog(self, ctx: commands.Context, cog: str):
@@ -110,6 +114,9 @@ class Admin(commands.Cog):
             await ctx.send(f'{cog} not found.')
         except commands.NoEntryPointError:
             await ctx.send(f'{cog} has no setup function.')
+        except:
+            print(f'An unhandled error was thrown while loading {cog}')
+            traceback.print_exc()
 
     @commands.command(name='unload', hidden=True)
     async def unload_cog(self, ctx: commands.Context, cog: str):
@@ -140,6 +147,9 @@ class Admin(commands.Cog):
             await ctx.send(f'{cog} unloaded successfully.')
         except commands.ExtensionNotLoaded:
             await ctx.send(f'{cog} not loaded.')
+        except:
+            print(f'An unhandled error was thrown while loading {cog}')
+            traceback.print_exc()
 
     @commands.command(name='logout', hidden=True)
     async def logout(self, ctx: commands.Context):
