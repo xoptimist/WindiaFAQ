@@ -1,9 +1,15 @@
 from discord.ext import tasks, commands
 import botcore
+import discord
 import windiautils
 
 class Help(commands.Cog):
     """A cog used for the Help command
+        
+    Members
+    -------
+    bot: botcore.Bot
+        The Discord Bot that the Cog is loaded into
     
     Methods
     -------
@@ -60,7 +66,11 @@ class Help(commands.Cog):
         messages.append(help)
 
         for message in messages:
-            await user.send(message)
+            try:
+                await user.send(message)
+            except discord.Forbidden:
+                await ctx.send('I could not DM you a list of commands since you are not accepting DMs from me.')
+                return
 
         await ctx.send('I have DMed you a list of commands.')
 

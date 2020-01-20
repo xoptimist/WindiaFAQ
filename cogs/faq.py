@@ -8,6 +8,14 @@ import windiautils
 
 class FAQ(commands.Cog):
     """A cog used for the Windia FAQ and managing the Windia FAQ
+        
+    Members
+    -------
+    bot: botcore.Bot
+        The Discord Bot that the Cog is loaded into
+
+    faq_commands: dict
+        A dictionary of frequently asked questions and their descriptions
     
     Methods
     -------
@@ -34,6 +42,9 @@ class FAQ(commands.Cog):
         -------
         bot: botcore.Bot
             The Discord Bot that the Cog is loaded into
+
+        faq_commands: dict
+            A dictionary of frequently asked questions and their descriptions
         """
 
         self.bot: botcore.Bot = bot

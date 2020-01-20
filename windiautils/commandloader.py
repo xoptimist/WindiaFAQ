@@ -8,14 +8,14 @@ def load_commands() -> dict
 def save_commands(commands: dict)
     Saves the commands to the commands file
 
-load_default_commands() -> dict
+__load_default_commands() -> dict
     Returns a dictionary of default commands
 """
 
 import os.path
 import json
 
-commands_file = 'commands.json'
+__commands_file = 'commands.json'
 
 def load_commands() -> dict:
     """Attempts to load commands stored in commands.json, else loads a dictionary of default commands
@@ -28,10 +28,10 @@ def load_commands() -> dict:
     A dictionary of FAQ commands
     """
     
-    if not os.path.exists(commands_file):
-        return load_default_commands()
+    if not os.path.exists(__commands_file):
+        return __load_default_commands()
     else:
-        with open(commands_file, 'r') as file:
+        with open(__commands_file, 'r') as file:
             return json.load(file)
 
 def save_commands(commands: dict):
@@ -39,7 +39,7 @@ def save_commands(commands: dict):
     
     save_commands(commands: dict)
 
-    Opens the commands_file in write-mode, then dumps the commands dictionary into the file.
+    Opens the __commands_file in write-mode, then dumps the commands dictionary into the file.
 
     Parameters
     ----------
@@ -55,13 +55,13 @@ def save_commands(commands: dict):
     if not isinstance(commands, dict):
         raise TypeError
 
-    with open(commands_file, 'w') as file:
+    with open(__commands_file, 'w') as file:
         json.dump(commands, file, indent=4)
         
-def load_default_commands() -> dict:
+def __load_default_commands() -> dict:
     """A dictionary of default commands
     
-    load_default_commands() -> dict
+    __load_default_commands() -> dict
     
     A dictionary of some default commands used. This is used when no commands file
     is found when loading commands, so these commands are then saved into the 

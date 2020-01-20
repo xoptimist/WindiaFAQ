@@ -3,6 +3,11 @@ import botcore
 
 class Admin(commands.Cog):
     """A cog to do admin errands such as loading/unloading other cogs
+        
+    Members
+    -------
+    bot: botcore.Bot
+        The Discord Bot that the Cog is loaded into
     
     Methods
     -------

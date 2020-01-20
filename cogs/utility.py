@@ -4,6 +4,11 @@ import botcore
 
 class Utility(commands.Cog):
     """A cog for various utilites to help out users
+        
+    Members
+    -------
+    bot: botcore.Bot
+        The Discord Bot that the Cog is loaded into
     
     Methods
     -------

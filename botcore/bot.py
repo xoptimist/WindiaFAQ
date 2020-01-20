@@ -11,6 +11,11 @@ import traceback
 class Bot(commands.Bot):
     """The Windia FAQ Bot base
     Inherits from discord.ext.commands.Bot
+
+    Members
+    -------
+    queued_commands
+        A list of commands queued by the bot to process and output to the user
     
     Methods
     -------
