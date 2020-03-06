@@ -49,9 +49,9 @@ class Help(commands.Cog):
 
         help = '''```Here is our list of commands
 
-        Utility Commands
-        ----------------
-        '''
+Utility Commands
+----------------
+'''
 
         for command in self.bot.walk_commands():
             # Don't show users the hidden commands
@@ -66,9 +66,9 @@ class Help(commands.Cog):
             help += f'{command.name} - {command.description}\n'
 
         help += '''
-        FAQ Commands
-        ------------
-        '''
+FAQ Commands
+------------
+'''
 
         for command, _ in windiautils.load_commands().items():
             if len(help) > 1900:
