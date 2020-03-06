@@ -70,7 +70,7 @@ class Help(commands.Cog):
         ------------
         '''
 
-        for command, description in windiautils.load_commands():
+        for command, _ in windiautils.load_commands():
             if len(help) > 1900:
                 messages.append(help)
                 help = '\n'
