@@ -79,7 +79,7 @@ class FAQ(commands.Cog):
         elif command in self.faq_commands:
             await ctx.send(f'{command} is already a registered command.')
         else:
-            self.faq_commands[command] = description
+            self.faq_commands[command.lower()] = description
             windiautils.save_commands(self.faq_commands)
             await ctx.send(f'{command} was added.')
 
@@ -112,7 +112,7 @@ class FAQ(commands.Cog):
         elif not description:
             await ctx.send('Please enter a description for the command.')
         else:
-            self.faq_commands[command] = description
+            self.faq_commands[command.lower()] = description
             windiautils.save_commands(self.faq_commands)
             await ctx.send(f'{command} was updated.')
 
@@ -186,11 +186,12 @@ class FAQ(commands.Cog):
             The message object sent by the user to parse for a FAQ command
         """
 
-        raw_command = message.content.lower()[1::].split(' ')
-        command = raw_command[0]
+        if message.content.startswith(self.bot.command_prefix):
+            raw_command = message.content.lower()[1::].split(' ')
+            command = raw_command[0]
 
-        if command in self.faq_commands:
-            await message.channel.send(self.faq_commands[command])
+            if command in self.faq_commands:
+                await message.channel.send(self.faq_commands[command])
 
 def setup(bot):
     """Adds the cog to the Discord Bot

@@ -27,7 +27,7 @@ class Utility(commands.Cog):
 
         self.bot: botcore.Bot = bot
 
-    @commands.command(name='id', description='Gets the user\'s Discord ID')
+    @commands.command(name='id', description='Displays your Discord ID to link to Windia')
     async def get_id(self, ctx: commands.Context, member: discord.Member = None):
         """Tells a user their Discord ID
         
@@ -38,11 +38,13 @@ class Utility(commands.Cog):
         the command, it will post the mentioned user's Discord ID, else it will post
         the user invoking the command's Discord ID.
         """
-        
-        id = member.id if member else ctx.author.id
-        mention = member.mention if member else ctx.author.mention
 
-        await ctx.send(f'{mention}, your Discord ID is `{id}`\nType `@discord` in game and then enter this ID into the text box to link your in-game account to your Discord account.')
+        member = member or ctx.author
+        
+        id = member.id
+        mention = member.mention
+
+        return await ctx.send(f'{mention}, your Discord ID is `{id}`\nType `@discord` in game and then enter this ID into the text box to link your in-game account to your Discord account.')
 
 def setup(bot):
     """Adds the cog to the Discord Bot

@@ -45,34 +45,48 @@ class Help(commands.Cog):
             The context of the command sent by the user
         """
         
-        user = self.bot.get_user(ctx.author.id)
-        bot_commands = list(self.bot.commands) + list(windiautils.load_commands())
         messages = list()
 
-        help = 'Here is our list of commands\n\n'
+        help = '''```Here is our list of commands
 
-        for command in bot_commands:
+        Utility Commands
+        ----------------
+        '''
+
+        for command in self.bot.walk_commands():
             # Don't show users the hidden commands
-            if isinstance(command, commands.Command) and command.hidden:
+            if command.hidden:
                 continue
 
             # Check for a number below 2000 so the message doesn't go over 2000 characters
             if len(help) > 1900:
-                message.append(help)
+                messages.append(help)
                 help = '\n'
+                
+            help += f'{command.name} - {command.description}\n'
 
-            help += f'`{command}`\n'
+        help += '''
+        FAQ Commands
+        ------------
+        '''
+
+        for command, description in windiautils.load_commands():
+            if len(help) > 1900:
+                messages.append(help)
+                help = '\n'
+                
+            help += f'{command}\n'
+
+        help += '```'
 
         messages.append(help)
 
         for message in messages:
             try:
-                await user.send(message)
+                await ctx.author.send(message)
+                return await ctx.send('I have DMed you a list of commands.', delete_after=5.0)
             except discord.Forbidden:
-                await ctx.send('I could not DM you a list of commands since you are not accepting DMs from me.')
-                return
-
-        await ctx.send('I have DMed you a list of commands.')
+                return await ctx.send('I could not DM you a list of commands since you are not accepting DMs from me.')
 
 def setup(bot):
     """Adds the cog to the Discord Bot

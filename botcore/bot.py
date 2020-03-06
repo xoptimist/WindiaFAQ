@@ -63,28 +63,28 @@ class Bot(commands.Bot):
         
         print(f'{self.user.name} connected.')
 
-    async def on_error(self, event: str, *args, **kwargs):
-        """Prints unhandled errors to console
+    #async def on_error(self, event: str, *args, **kwargs):
+    #    """Prints unhandled errors to console
         
-        await on_error(event: str, *args, **kwargs)
+    #    await on_error(event: str, *args, **kwargs)
 
-        This is a coroutine. This is not called directly; it is fired whenever the
-        bot catches an exception that is unhandled. This event prints an error
-        message to the console.
+    #    This is a coroutine. This is not called directly; it is fired whenever the
+    #    bot catches an exception that is unhandled. This event prints an error
+    #    message to the console.
 
-        TODO: Add logging to a Discord channel.
+    #    TODO: Add logging to a Discord channel.
 
-        Parameters
-        ----------
+    #    Parameters
+    #    ----------
 
-        event: str
-            The event method's name that caused the exception.
-        """
+    #    event: str
+    #        The event method's name that caused the exception.
+    #    """
 
-        error_message = args[0]
+    #    error_message = args[0]
 
-        print(f'Unhandled exception caused by event: {event}' \
-              f'Exception: {message}')
+    #    print(f'Unhandled exception caused by event: {event}\n' \
+    #          f'Exception: {error_message.content}')
 
     async def on_command_error(self, ctx: commands.Context, exception: commands.CommandError):
         """Prints unhandled command errors to console.
@@ -170,5 +170,5 @@ class Bot(commands.Bot):
         before the bot initializes command processing.
         """
 
-        await self.bot.wait_until_ready()
+        await self.wait_until_ready()
         print('Command Processing started')
