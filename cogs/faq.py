@@ -196,13 +196,8 @@ class FAQ(commands.Cog):
             elif command not in self.faq_commands and not self.bot.get_command(command):
                 closest_commands = await self.get_closest_commands(command)
                 if len(closest_commands) > 0:
-                    description = '\n'.join([ f'**{command}**' for command in closest_commands ])
-                    embed = discord.Embed(
-                        title='Did you mean...',
-                        description=description,
-                        colour=discord.Color.purple())
-
-                    await message.channel.send(embed=embed)
+                    cmds = ', '.join([ f'**{command}**' for command in closest_commands ])
+                    await message.channel.send(f'Did you mean... {cmds}')
 
     async def get_closest_commands(self, cmd: str):
         all_commands = list(self.faq_commands.keys()) + [ command.name for command in list(self.bot.commands) ]
