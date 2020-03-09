@@ -193,7 +193,7 @@ class FAQ(commands.Cog):
 
             if command in self.faq_commands:
                 await message.channel.send(self.faq_commands[command])
-            elif command not in self.faq_commands and command not in self.bot.commands:
+            elif command not in self.faq_commands and not self.bot.get_command(command):
                 closest_commands = await self.get_closest_commands(command)
                 if len(closest_commands) > 0:
                     description = '\n'.join([ f'**{command}**' for command in closest_commands ])
@@ -210,7 +210,7 @@ class FAQ(commands.Cog):
 
         async def iter_commands():
             for command in all_commands:
-                if difflib.SequenceMatcher(None, cmd, command).ratio() > 0.8:
+                if difflib.SequenceMatcher(None, cmd, command).ratio() >= 0.8:
                     closest_commands.append(command)
         
         future = asyncio.ensure_future(iter_commands())

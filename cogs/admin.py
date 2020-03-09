@@ -1,6 +1,6 @@
 from discord.ext import tasks, commands
 import botcore
-import traceback
+import os
 import sys
 
 class Admin(commands.Cog):
@@ -180,6 +180,24 @@ class Admin(commands.Cog):
         """
 
         return self.bot.is_owner(ctx.author)
+
+    @commands.command(name='restart', hidden=True)
+    async def restart(self, ctx):
+        """Restarts the bot's script"""
+        await ctx.send('Restarting')
+
+        if os.name == 'nt':
+            os.system('py .')
+        else:
+            os.system('python3.8 .')
+
+        await self.bot.logout()
+
+    @commands.command(name='pull', hidden=True)
+    async def update_bot(self, ctx):
+        """Updates the bot"""
+        await ctx.send('Updating')
+        os.system('git pull')
 
 def setup(bot):
     """Adds the cog to the Discord Bot
