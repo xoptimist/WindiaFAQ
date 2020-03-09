@@ -200,7 +200,7 @@ class FAQ(commands.Cog):
                     embed = discord.Embed(
                         title='Did you mean...',
                         description=description,
-                        colour=discord.Color.gold())
+                        colour=discord.Color.purple())
 
                     await message.channel.send(embed=embed)
 
