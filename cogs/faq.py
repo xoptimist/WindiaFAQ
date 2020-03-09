@@ -197,7 +197,7 @@ class FAQ(commands.Cog):
                 closest_commands = await self.get_closest_commands(command)
                 if len(closest_commands) > 0:
                     cmds = ', '.join([ f'**{command}**' for command in closest_commands ])
-                    await message.channel.send(f'Did you mean... {cmds}')
+                    await message.channel.send(f'Did you mean... {cmds}?')
 
     async def get_closest_commands(self, cmd: str):
         all_commands = list(self.faq_commands.keys()) + [ command.name for command in list(self.bot.commands) ]
@@ -205,7 +205,7 @@ class FAQ(commands.Cog):
 
         async def iter_commands():
             for command in all_commands:
-                if difflib.SequenceMatcher(None, cmd, command).ratio() >= 0.8:
+                if difflib.SequenceMatcher(None, cmd, command).ratio() >= min(0.8, 1.0 - 1/len(cmd)):
                     closest_commands.append(command)
         
         future = asyncio.ensure_future(iter_commands())
