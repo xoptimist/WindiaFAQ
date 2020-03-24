@@ -62,7 +62,7 @@ class Utility(commands.Cog):
 
         if (windia_bot := ctx.guild.get_member(614221348780113920)):
             activity = windia_bot.activity
-            online_count = int(activity.split(' ')[3])
+            online_count = int(activity.description.split(' ')[3])
             if online_count < 4: return await ctx.send(f'The server is currently **offline**.')
             else: return await ctx.send(f'The server is currently **online** with {online_count} players.')
         else:
