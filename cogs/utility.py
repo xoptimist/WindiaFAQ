@@ -60,7 +60,7 @@ class Utility(commands.Cog):
         if isinstance(ctx.guild, discord.DMChannel):
             return await ctx.send('This command may only be used in the Windia Discord.')
 
-        if (windia_bot := ctx.guild.get_user(614221348780113920)):
+        if (windia_bot := ctx.guild.get_member(614221348780113920)):
             activity = windia_bot.activity
             online_count = int(activity.split(' ')[3])
             if online_count < 4: return await ctx.send(f'The server is currently **offline**.')
