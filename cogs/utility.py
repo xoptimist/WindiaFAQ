@@ -28,10 +28,10 @@ class Utility(commands.Cog):
         self.bot: botcore.Bot = bot
 
     @commands.command(name='id', description='Displays your Discord ID to link to Windia')
-    async def get_id(self, ctx: commands.Context, member: discord.Member = None):
+    async def id_command(self, ctx: commands.Context, member: discord.Member = None):
         """Tells a user their Discord ID
         
-        await get_id(ctx: discord.ext.commands.Context[, *, member: discord.Member = None])
+        await id_command(ctx: discord.ext.commands.Context[, *, member: discord.Member = None])
         
         This is a coroutine. This is not directly called; it is called whenever
         a user uses the `$id` command. If a member (usually a user mention) follows
@@ -45,6 +45,29 @@ class Utility(commands.Cog):
         mention = member.mention
 
         return await ctx.send(f'{mention}, your Discord ID is `{id}`\nType `@discord` in game and then enter this ID into the text box to link your in-game account to your Discord account.')
+
+    @commands.command(name='online', description='Displays the online count')
+    async def online_command(self, ctx: commands.Context):
+        """Displays the online count for Windia
+        
+        await online_command(ctx: discord.ext.commands.Context)
+        
+        This is a coroutine. This is not directly called; it is called whenever
+        a user uses the `$online` command. This function displays the Windia
+        online count by obtaining it from Windia Bot's status.
+        """
+
+        if isinstance(ctx.guild, discord.DMChannel):
+            return await ctx.send('This command may only be used in the Windia Discord.')
+
+        if (windia_bot := ctx.guild.get_user(614221348780113920)):
+            activity = windia_bot.activity
+            online_count = int(activity.split(' ')[3])
+            if online_count < 4: return await ctx.send(f'The server is currently **offline**.')
+            else: return await ctx.send(f'The server is currently **online** with {online_count} players.')
+        else:
+            return await ctx.send('I am currently unable to get the online count, sorry!')
+
 
 def setup(bot):
     """Adds the cog to the Discord Bot
