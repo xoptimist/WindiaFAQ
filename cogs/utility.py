@@ -1,6 +1,10 @@
 from discord.ext import tasks, commands
 import discord
 import botcore
+import math
+import re
+from sympy.solvers import solve
+from sympy import Symbol
 
 class Utility(commands.Cog):
     """A cog for various utilites to help out users
@@ -27,7 +31,7 @@ class Utility(commands.Cog):
 
         self.bot: botcore.Bot = bot
 
-    @commands.command(name='id', description='Displays your Discord ID to link to Windia')
+    @commands.command(name='id', description='Displays your Discord ID to link to Windia', usage=f'id [<user mention>]')
     async def id_command(self, ctx: commands.Context, member: discord.Member = None):
         """Tells a user their Discord ID
         
@@ -68,6 +72,69 @@ class Utility(commands.Cog):
         else:
             return await ctx.send('I am currently unable to get the online count, sorry!')
 
+    @commands.command(name='magic', description='Shows how much magic needed to one shot a monster')
+    async def magic_command(self, ctx, hp=None, spellatk=None, *, args=None):
+        if not hp and not spellatk and not args:
+            message = (
+                f'Usage: {self.bot.command_prefix}magic <hp> <spell attack> <args>\n'
+                f'Args:\n'
+                f'\t-a: Elemental Amplification\n'
+                f'\t-l: Loveless Staff\n'
+                f'\t-s: Elemental Staff\n'
+                f'\t-e: Elemental Advantage\n'
+                f'\t-d: Elemental Disadvantage\n\n'
+                f'Example Usage: {self.bot.command_prefix}magic 43376970 570 -asle'
+            )
+
+            return await ctx.send(message)
+        
+        if not hp:
+            return await ctx.send(f'Please enter an amount of HP.\nEX: {self.bot.command_prefix}magic 32000000 <spell attack> <args>')
+        elif not spellatk:
+            return await ctx.send(f'Please enter an amount of Spell Attack.\nEX: {self.bot.command_prefix}magic <hp> 570 <args>')
+        else:
+            try:
+                hp = int(hp)
+                spellatk = int(spellatk)
+            except:
+                return await ctx.send(f'HP and Spell Attack values must be an integer.')
+
+        staff = 1.0
+        elemental = 1.0
+        amp = 1.0
+        mastery = 0.6
+
+        if args:
+            if re.search(r'-[^l]*l[^l]*', args):    # loveless
+                staff = 1.25
+            elif re.search(r'-[^s]*s[^s]*', args):  # elemental staff
+                staff = 1.25
+
+            if re.search(r'-[^e]*e[^e]*', args):    # elemental advantage
+                elemental = 1.5
+            elif re.search(r'-[^d]*d[^d]*', args):  # elemental disadvantage
+                elemental = 0.5
+
+            if re.search(r'-[^a]*a[^a]*', args):    # elemental amp
+                amp = 1.4
+        
+        x = Symbol('x')
+        solution = solve(((((((((x**2)/1000.0 + x *mastery *0.9)/30.0 + x/200.0)) *spellatk) *amp) *staff) *elemental)/hp - 1.0, x)
+        magic = min([math.ceil(num) for num in solution if num >= 0.0])
+
+        message = (
+            '```\n'
+            '              STATS             \n'
+            '--------------------------------\n'
+            f'Staff Multiplier Bonus:    {staff}x\n'
+            f'Elemental Advantage Bonus: {elemental}x\n'
+            f'Elemental Amp Bonus:       {amp}x\n'
+            f'Spell Attack:              {spellatk}\n\n'
+            f'The amount of magic needed to one shot a monster with {hp} HP is approximately {magic}.\n'
+            '```'
+        )
+
+        return await ctx.send(message)
 
 def setup(bot):
     """Adds the cog to the Discord Bot
