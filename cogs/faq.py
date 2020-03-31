@@ -77,7 +77,7 @@ class FAQ(commands.Cog):
             await ctx.send('Please enter a command to add.')
         elif not description:
             await ctx.send('Please enter a description for the command.')
-        elif command in self.faq_commands:
+        elif command in self.faq_commands or self.bot.get_command(command):
             await ctx.send(f'{command} is already a registered command.')
         else:
             self.faq_commands[command.lower()] = description
