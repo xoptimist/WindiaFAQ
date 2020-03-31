@@ -1,5 +1,6 @@
 from discord.ext import tasks, commands
 import discord
+import discord.utils
 import botcore
 import math
 import re
@@ -135,6 +136,11 @@ class Utility(commands.Cog):
         )
 
         return await ctx.send(message)
+
+    @commands.command(name='rtfa', description='Read the fuarking announcement')
+    async def rtfa_command(self, ctx):
+        if (announce := discord.utils.get(ctx.guild.text_channels, name='announce')):
+            return await ctx.send(f'> {announce.last_message}\n{announce.mention}')
 
 def setup(bot):
     """Adds the cog to the Discord Bot
