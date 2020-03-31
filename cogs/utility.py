@@ -140,7 +140,7 @@ class Utility(commands.Cog):
     @commands.command(name='rtfa', description='Read the fuarking announcement')
     async def rtfa_command(self, ctx):
         if (announce := discord.utils.get(ctx.guild.text_channels, name='announce')):
-            return await ctx.send(f'> {announce.last_message}\n{announce.mention}')
+            return await ctx.send(f'> {announce.last_message.clean_content}\n{announce.mention}')
 
 def setup(bot):
     """Adds the cog to the Discord Bot
