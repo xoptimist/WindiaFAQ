@@ -148,11 +148,11 @@ class FAQ(commands.Cog):
     def cog_check(self, ctx: commands.Context):
         """Checks if the user attempting to invoke an admin command has the manage_message permission
         
-        cog_check(ctx: discord.ext.commands.Context)
+        self.cog_check(ctx: discord.ext.commands.Context)
         
         This is a coroutine. This is not called directly; it is called whenever
-        a Cog command is sent by a user. This checks if the user sending the
-        command has the manage_messages permissions. If this fails, then
+        a Cog command is sent by a user. This checks if the user sending any commands
+        in this cog has the manage_messages permissions. If this fails, then
         the command is not processed.
 
         Parameters

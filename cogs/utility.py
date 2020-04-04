@@ -72,6 +72,7 @@ class Utility(commands.Cog):
             else: return await ctx.send(f'The server is currently **online** with {online_count} players.')
         else:
             return await ctx.send('I am currently unable to get the online count, sorry!')
+            
 
     @commands.command(name='magic', description='Shows how much magic needed to one shot a monster')
     async def magic_command(self, ctx, hp=None, spellatk=None, *, args=None):
@@ -139,9 +140,9 @@ class Utility(commands.Cog):
 
     @commands.command(name='rtfa', description='Read the fuarking announcement')
     async def rtfa_command(self, ctx):
-        if (announce := discord.utils.get(ctx.guild.text_channels, name='announce')):
-            message = announce.last_message.clean_content.replace('\n', '\n> ')
-            return await ctx.send(f'> {message}\n{announce.mention}')
+        if (announce := discord.utils.get(self.bot.get_guild(610212514856435719).text_channels, name='announce')):
+            message = '> '.join(announce.last_message.clean_content.split('\n'))
+            return await ctx.send(f'\n> {message}\n{announce.mention}')
 
 def setup(bot):
     """Adds the cog to the Discord Bot

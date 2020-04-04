@@ -156,8 +156,8 @@ class Bot(commands.Bot):
         from the users of its guilds. This is a First-In-First-Out process.
         """
 
-        if len(self.unprocessed_commands) > 0:
-            await self.unprocessed_commands.pop(0)
+        if len(self.queued_commands) > 0:
+            await self.queued_commands.pop(0)
 
     @dequeue_commands.before_loop
     async def before_dequeue_commands(self):
