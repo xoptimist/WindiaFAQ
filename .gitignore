@@ -5,7 +5,6 @@
 
 # Windia FAQ-specific files
 *.env
-*.json
 
 # Python-specific files
 env/
