@@ -117,6 +117,18 @@ class FAQ(commands.Cog):
             windiautils.save_commands(self.faq_commands)
             await ctx.send(f'{command} was updated.')
 
+    @commands.command(name='alias', hidden=True)
+    async def alias_command(self, ctx: commands.Context, command: str = None, alias: str = None):
+        if not command or not alias:
+            return await ctx.send(f'Please add a command and an alias for it.')
+        
+        if not command in self.faq_commands:
+            return await ctx.send(f'{command} is not a registered command.')
+
+        self.faq_commands[alias] = self.faq_commands[command]
+        windiautils.save_commands(self.faq_commands)
+        return await ctx.send(f'The alias {alias} has been added to {command}.')
+
     @commands.command(name='remove', hidden=True)
     async def remove_command(self, ctx: commands.Context, command: str = None):
         """Attempts to remove an existing FAQ command

@@ -46,7 +46,7 @@ bot = Bot(prefix)
 for cog in cogs:
     try:
         bot.load_extension(cog)
-        print(f'{cog} loaded')
+        print(f'{cog} loaded.')
     except commands.ExtensionAlreadyLoaded:
         print(f'{cog} is already loaded.')
     except commands.ExtensionNotFound:

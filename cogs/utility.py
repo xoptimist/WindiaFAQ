@@ -74,6 +74,7 @@ class Utility(commands.Cog):
             return await ctx.send('I am currently unable to get the online count, sorry!')
             
 
+    # REMINDER: Check the flags repo
     @commands.command(name='magic', description='Shows how much magic needed to one shot a monster')
     async def magic_command(self, ctx, hp=None, spellatk=None, *, args=None):
         if not hp and not spellatk and not args:
