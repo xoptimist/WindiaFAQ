@@ -3,7 +3,6 @@ import asyncio
 import botcore
 import discord
 import difflib
-import json
 import os.path
 import windiautils
 
@@ -119,6 +118,26 @@ class FAQ(commands.Cog):
 
     @commands.command(name='alias', hidden=True)
     async def alias_command(self, ctx: commands.Context, command: str = None, alias: str = None):
+        """Attempts to alias an existing FAQ command
+        
+        await update_command(ctx: commands.context[, command: str = None, alias: str = None])
+
+        This is a coroutine. This is not called directly; it is called whenever
+        the Bot receives the command `$alias` from a user. This command attempts
+        to alias the given FAQ command with the given alias.
+
+        Parameters
+        ----------
+        ctx: discord.ext.commands.Context
+            The context of the message sent by the user
+
+        [command: str = None]
+            The FAQ command to be updated
+
+        [alias: str = None]
+            The new alias for the given FAQ command
+        """
+
         if not command or not alias:
             return await ctx.send(f'Please add a command and an alias for it')
         elif not command in self.faq_commands:
@@ -179,7 +198,7 @@ class FAQ(commands.Cog):
     @commands.Cog.listener('on_message')
     async def faq_check(self, message: discord.Message):
         """Check if the user is trying to invoke an faq_command
-        
+6        
         await faq_check(message: discord.Message)
 
         This is a coroutine. This is not called directly. This event is
@@ -221,7 +240,7 @@ class FAQ(commands.Cog):
 
         async def iter_commands():
             for command in all_commands:
-                if difflib.SequenceMatcher(None, cmd, command).ratio() > min(0.8, 1.0 - 1/len(cmd)):
+                if cmd in command or difflib.SequenceMatcher(None, cmd, command).ratio() > min(0.8, 1.0 - 1/len(cmd)):
                     closest_commands.append(command)
         
         future = asyncio.ensure_future(iter_commands())
