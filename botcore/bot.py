@@ -108,6 +108,9 @@ class Bot(commands.Bot):
             The exception that was thrown
         """
 
+        if isinstance(exception, commands.CheckFailure):
+            return
+
         error_message = f'Unhandled exception by: {ctx.author.name}\n' \
                         f'Message: {ctx.message.content}\n' \
                         f'Error Type: {type(exception).__name__}\n' \
@@ -143,8 +146,10 @@ class Bot(commands.Bot):
             if self.get_command(command):
                 task = asyncio.create_task(self.process_commands(message))
                 self.queued_commands.append(task)
+                if not self.dequeue_commands.get_task():
+                    self.dequeue_commands.start()
 
-    @tasks.loop(seconds=1/10)
+    @tasks.loop(seconds=1/2)
     async def dequeue_commands(self):
         """A loop to process commands from the bot's guild members
 
@@ -156,8 +161,8 @@ class Bot(commands.Bot):
         from the users of its guilds. This is a First-In-First-Out process.
         """
 
-        if len(self.queued_commands) > 0:
-            await self.queued_commands.pop(0)
+        if len(self.queued_commands) > 0: await self.queued_commands.pop(0)
+        else: self.dequeue_commands.cancel()
 
     @dequeue_commands.before_loop
     async def before_dequeue_commands(self):
