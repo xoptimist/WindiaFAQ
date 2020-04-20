@@ -63,28 +63,25 @@ class Bot(commands.Bot):
         
         print(f'{self.user.name} connected.')
 
-    #async def on_error(self, event: str, *args, **kwargs):
-    #    """Prints unhandled errors to console
+    async def on_error(self, event: str, *args, **kwargs):
+       """Prints unhandled errors to console
         
-    #    await on_error(event: str, *args, **kwargs)
+       await on_error(event: str, *args, **kwargs)
 
-    #    This is a coroutine. This is not called directly; it is fired whenever the
-    #    bot catches an exception that is unhandled. This event prints an error
-    #    message to the console.
+       This is a coroutine. This is not called directly; it is fired whenever the
+       bot catches an exception that is unhandled. This event prints an error
+       message to the console.
 
-    #    TODO: Add logging to a Discord channel.
+       TODO: Add logging to a Discord channel.
 
-    #    Parameters
-    #    ----------
+       Parameters
+       ----------
 
-    #    event: str
-    #        The event method's name that caused the exception.
-    #    """
-
-    #    error_message = args[0]
-
-    #    print(f'Unhandled exception caused by event: {event}\n' \
-    #          f'Exception: {error_message.content}')
+       event: str
+           The event method's name that caused the exception.
+       """
+       
+       traceback.print_exc()
 
     async def on_command_error(self, ctx: commands.Context, exception: commands.CommandError):
         """Prints unhandled command errors to console.
@@ -112,11 +109,10 @@ class Bot(commands.Bot):
             return
 
         error_message = f'Unhandled exception by: {ctx.author.name}\n' \
-                        f'Message: {ctx.message.content}\n' \
-                        f'Error Type: {type(exception).__name__}\n' \
-                        f'Error: {exception}'
+                        f'Message:                {ctx.message.content}\n'
 
         print(error_message)
+        traceback.print_exc()
 
     async def on_message(self, message: discord.Message):
         """An event thrown when a user sends a message in the bot's guilds, used for command handling.
