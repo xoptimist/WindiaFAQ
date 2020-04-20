@@ -104,7 +104,6 @@ class Utility(commands.Cog):
 
         staff = 1.0
         elemental = 1.0
-        amp = 1.0
         mastery = 0.6
 
         if args:
@@ -118,32 +117,37 @@ class Utility(commands.Cog):
             elif re.search(r'-[^d]*d[^d]*', args):  # elemental disadvantage
                 elemental = 0.5
 
-            if re.search(r'-[^a]*a[^a]*', args):    # elemental amp
-                amp = 1.4
-        
-        x = Symbol('x')
-        solution = solve(((((((((x**2)/1000.0 + x *mastery *0.9)/30.0 + x/200.0)) *spellatk) *amp) *staff) *elemental)/hp - 1.0, x)
-        magic = min([math.ceil(num) for num in solution if num >= 0.0])
-
         message = (
             '```\n'
             '              STATS             \n'
             '--------------------------------\n'
+            f'Spell Attack:              {spellatk}\n\n'
             f'Staff Multiplier Bonus:    {staff}x\n'
             f'Elemental Advantage Bonus: {elemental}x\n'
-            f'Elemental Amp Bonus:       {amp}x\n'
-            f'Spell Attack:              {spellatk}\n\n'
-            f'The amount of magic needed to one shot a monster with {hp} HP is approximately {magic}.\n'
-            '```'
         )
+        
+        x = Symbol('x')
+
+        if re.search(r'-[^a]*a[^a]*', args):    # elemental amp
+            message += f'Elemental Amp Bonus:       [BW] 1.3x/[FP/IL] 1.4x\n\n'
+
+            # F/P and I/L
+            amp = 1.4
+            solution = solve(((((((((x**2)/1000.0 + x *mastery *0.9)/30.0 + x/200.0)) *spellatk) *amp) *staff) *elemental)/hp - 1.0, x)
+            fpil_magic = min([math.ceil(num) for num in solution if num >= 0.0])
+            message += f'The magic required for non-BW to one shot a mob with {hp} HP is: {fpil_magic}.\n'
+
+            # BW
+            amp = 1.3
+            solution = solve(((((((((x**2)/1000.0 + x *mastery *0.9)/30.0 + x/200.0)) *spellatk) *amp) *staff) *elemental)/hp - 1.0, x)
+            bw_magic = min([math.ceil(num) for num in solution if num >= 0.0])
+            message += f'The magic required for BW to one shot a mob with {hp} HP is: {bw_magic}.\n```'
+        else:
+            solution = solve((((((((x**2)/1000.0 + x *mastery *0.9)/30.0 + x/200.0)) *spellatk) *staff) *elemental)/hp - 1.0, x)
+            magic = min([math.ceil(num) for num in solution if num >= 0.0])
+            message += f'The magic required to one shot a mob with {hp} HP is: {magic}.\n```'
 
         return await ctx.send(message)
-
-    @commands.command(name='rtfa', description='Read the fuarking announcement')
-    async def rtfa_command(self, ctx):
-        if (announce := discord.utils.get(self.bot.get_guild(610212514856435719).text_channels, name='announce')):
-            message = '> '.join(announce.last_message.clean_content.split('\n'))
-            return await ctx.send(f'\n> {message}\n{announce.mention}')
 
 def setup(bot):
     """Adds the cog to the Discord Bot
