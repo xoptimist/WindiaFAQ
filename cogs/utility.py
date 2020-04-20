@@ -121,14 +121,14 @@ class Utility(commands.Cog):
             '```\n'
             '              STATS             \n'
             '--------------------------------\n'
-            f'Spell Attack:              {spellatk}\n\n'
+            f'Spell Attack:              {spellatk}\n'
             f'Staff Multiplier Bonus:    {staff}x\n'
             f'Elemental Advantage Bonus: {elemental}x\n'
         )
         
         x = Symbol('x')
 
-        if re.search(r'-[^a]*a[^a]*', args):    # elemental amp
+        if args and re.search(r'-[^a]*a[^a]*', args):    # elemental amp
             message += f'Elemental Amp Bonus:       [BW] 1.3x/[FP/IL] 1.4x\n\n'
 
             # F/P and I/L
@@ -145,7 +145,7 @@ class Utility(commands.Cog):
         else:
             solution = solve((((((((x**2)/1000.0 + x *mastery *0.9)/30.0 + x/200.0)) *spellatk) *staff) *elemental)/hp - 1.0, x)
             magic = min([math.ceil(num) for num in solution if num >= 0.0])
-            message += f'The magic required to one shot a mob with {hp} HP is: {magic}.\n```'
+            message += f'\nThe magic required to one shot a mob with {hp} HP is: {magic}.\n```'
 
         return await ctx.send(message)
 
