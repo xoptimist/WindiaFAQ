@@ -3,7 +3,6 @@ import asyncio
 import botcore
 import discord
 import difflib
-import json
 import os.path
 import windiautils
 
@@ -74,15 +73,15 @@ class FAQ(commands.Cog):
         """
 
         if not command:
-            await ctx.send('Please enter a command to add.')
+            return await ctx.send('Please enter a command to add.')
         elif not description:
-            await ctx.send('Please enter a description for the command.')
+            return await ctx.send('Please enter a description for the command.')
         elif command in self.faq_commands or self.bot.get_command(command):
-            await ctx.send(f'{command} is already a registered command.')
-        else:
-            self.faq_commands[command.lower()] = description
-            windiautils.save_commands(self.faq_commands)
-            await ctx.send(f'{command} was added.')
+            return await ctx.send(f'{command} is already a registered command.')
+            
+        self.faq_commands[command.lower()] = description
+        windiautils.save_commands(self.faq_commands)
+        return await ctx.send(f'{command} was added.')
 
     @commands.command(name='update', hidden=True)
     async def update_command(self, ctx: commands.Context, command: str = None, *, description: str = None):
@@ -107,25 +106,46 @@ class FAQ(commands.Cog):
         """
 
         if not command:
-            await ctx.send('Please enter a command to update.')
+            return await ctx.send('Please enter a command to update.')
         elif not command in self.faq_commands:
-            await ctx.send(f'{command} is not a registered command.')
+            return await ctx.send(f'{command} is not a registered command.')
         elif not description:
-            await ctx.send('Please enter a description for the command.')
-        else:
-            self.faq_commands[command.lower()] = description
-            windiautils.save_commands(self.faq_commands)
-            await ctx.send(f'{command} was updated.')
+            return await ctx.send('Please enter a description for the command.')
+        
+        self.faq_commands[command.lower()] = description
+        windiautils.save_commands(self.faq_commands)
+        return await ctx.send(f'{command} was updated.')
 
     @commands.command(name='alias', hidden=True)
     async def alias_command(self, ctx: commands.Context, command: str = None, alias: str = None):
-        if not command or not alias:
-            return await ctx.send(f'Please add a command and an alias for it.')
+        """Attempts to alias an existing FAQ command
         
-        if not command in self.faq_commands:
-            return await ctx.send(f'{command} is not a registered command.')
+        await update_command(ctx: commands.context[, command: str = None, alias: str = None])
 
-        self.faq_commands[alias] = self.faq_commands[command]
+        This is a coroutine. This is not called directly; it is called whenever
+        the Bot receives the command `$alias` from a user. This command attempts
+        to alias the given FAQ command with the given alias.
+
+        Parameters
+        ----------
+        ctx: discord.ext.commands.Context
+            The context of the message sent by the user
+
+        [command: str = None]
+            The FAQ command to be updated
+
+        [alias: str = None]
+            The new alias for the given FAQ command
+        """
+
+        if not command or not alias:
+            return await ctx.send(f'Please add a command and an alias for it')
+        elif not command in self.faq_commands:
+            return await ctx.send(f'{command} is not a registered command.')
+        elif alias in self.faq_commands:
+            return await ctx.send(f'{alias} is already a registered command.')
+
+        self.faq_commands[alias.lower()] = self.faq_commands[command]
         windiautils.save_commands(self.faq_commands)
         return await ctx.send(f'The alias {alias} has been added to {command}.')
 
@@ -149,13 +169,13 @@ class FAQ(commands.Cog):
         """
 
         if not command:
-            await ctx.send('Please enter a command to remove.')
+            return await ctx.send('Please enter a command to remove.')
         elif not command in self.faq_commands:
-            await ctx.send(f'{command} is not a registered command.')
-        else:
-            self.faq_commands.pop(command)
-            windiautils.save_commands(self.faq_commands)
-            await ctx.send(f'{command} was removed.')
+            return await ctx.send(f'{command} is not a registered command.')
+            
+        self.faq_commands.pop(command)
+        windiautils.save_commands(self.faq_commands)
+        return await ctx.send(f'{command} was removed.')
 
     def cog_check(self, ctx: commands.Context):
         """Checks if the user attempting to invoke an admin command has the manage_message permission
@@ -178,7 +198,7 @@ class FAQ(commands.Cog):
     @commands.Cog.listener('on_message')
     async def faq_check(self, message: discord.Message):
         """Check if the user is trying to invoke an faq_command
-        
+6        
         await faq_check(message: discord.Message)
 
         This is a coroutine. This is not called directly. This event is
@@ -220,7 +240,7 @@ class FAQ(commands.Cog):
 
         async def iter_commands():
             for command in all_commands:
-                if difflib.SequenceMatcher(None, cmd, command).ratio() > min(0.8, 1.0 - 1/len(cmd)):
+                if cmd in command or difflib.SequenceMatcher(None, cmd, command).ratio() > min(0.8, 1.0 - 1/len(cmd)):
                     closest_commands.append(command)
         
         future = asyncio.ensure_future(iter_commands())
