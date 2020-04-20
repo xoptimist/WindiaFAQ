@@ -79,7 +79,7 @@ class Utility(commands.Cog):
     async def magic_command(self, ctx, hp=None, spellatk=None, *, args=None):
         if not hp and not spellatk and not args:
             message = (
-                f'Usage: {self.bot.command_prefix}magic <hp> <spell attack> <args>\n'
+                f'Usage: {self.bot.command_prefix}{ctx.invoked_with} <hp> <spell attack> <args>\n'
                 f'Args:\n'
                 f'\t-a: Elemental Amplification\n'
                 f'\t-l: Loveless Staff\n'
@@ -102,50 +102,47 @@ class Utility(commands.Cog):
             except:
                 return await ctx.send(f'HP and Spell Attack values must be an integer.')
 
+        message = (
+            f'```\n'
+            f'Spell Attack: {spellatk}\n'
+        )
+
         staff = 1.0
         elemental = 1.0
         mastery = 0.6
 
         if args:
-            if re.search(r'-[^l]*l[^l]*', args):    # loveless
+            if re.search(r'-[^l]*(l|s)[^l]*', args):# loveless or elemental staff
                 staff = 1.25
-            elif re.search(r'-[^s]*s[^s]*', args):  # elemental staff
-                staff = 1.25
-
+                message += f'Staff Multiplier: {staff}x\n'
             if re.search(r'-[^e]*e[^e]*', args):    # elemental advantage
                 elemental = 1.5
+                message += f'Elemental Advantage: {elemental}x\n'
             elif re.search(r'-[^d]*d[^d]*', args):  # elemental disadvantage
                 elemental = 0.5
-
-        message = (
-            '```\n'
-            '              STATS             \n'
-            '--------------------------------\n'
-            f'Spell Attack:              {spellatk}\n'
-            f'Staff Multiplier Bonus:    {staff}x\n'
-            f'Elemental Advantage Bonus: {elemental}x\n'
-        )
+                message += f'Elemental Disadvantage: {elemental}x\n'
         
         x = Symbol('x')
 
         if args and re.search(r'-[^a]*a[^a]*', args):    # elemental amp
-            message += f'Elemental Amp Bonus:       [BW] 1.3x/[FP/IL] 1.4x\n\n'
+            message += f'BW Elemental Amp: 1.3x\n'
+            message += f'FP/IL Elemental Amp: 1.4x\n\n'
 
             # F/P and I/L
             amp = 1.4
             solution = solve(((((((((x**2)/1000.0 + x *mastery *0.9)/30.0 + x/200.0)) *spellatk) *amp) *staff) *elemental)/hp - 1.0, x)
             fpil_magic = min([math.ceil(num) for num in solution if num >= 0.0])
-            message += f'The magic required for non-BW to one shot a mob with {hp} HP is: {fpil_magic}.\n'
+            message += f'Magic for F/P or I/L: {fpil_magic}\n'
 
             # BW
             amp = 1.3
             solution = solve(((((((((x**2)/1000.0 + x *mastery *0.9)/30.0 + x/200.0)) *spellatk) *amp) *staff) *elemental)/hp - 1.0, x)
             bw_magic = min([math.ceil(num) for num in solution if num >= 0.0])
-            message += f'The magic required for BW to one shot a mob with {hp} HP is: {bw_magic}.\n```'
+            message += f'Magic for BW: {bw_magic}```'
         else:
             solution = solve((((((((x**2)/1000.0 + x *mastery *0.9)/30.0 + x/200.0)) *spellatk) *staff) *elemental)/hp - 1.0, x)
             magic = min([math.ceil(num) for num in solution if num >= 0.0])
-            message += f'\nThe magic required to one shot a mob with {hp} HP is: {magic}.\n```'
+            message += f'\nMagic: {magic}```'
 
         return await ctx.send(message)
 
