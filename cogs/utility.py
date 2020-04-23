@@ -1,11 +1,12 @@
 from discord.ext import tasks, commands
+from datetime import datetime
+from sympy.solvers import solve
+from sympy import Symbol
 import discord
 import discord.utils
 import botcore
 import math
 import re
-from sympy.solvers import solve
-from sympy import Symbol
 
 class Utility(commands.Cog):
     """A cog for various utilites to help out users
@@ -145,6 +146,11 @@ class Utility(commands.Cog):
             message += f'\nMagic: {magic}```'
 
         return await ctx.send(message)
+
+    @commands.command(name='time', description='Displays the server time')
+    async def time_command(self, ctx):
+        fmt_time = datetime.utcnow().strftime('%H:%M:%S %d %b, %Y')
+        return await ctx.send(f'The server\'s current time is {fmt_time}.')
 
 def setup(bot):
     """Adds the cog to the Discord Bot
