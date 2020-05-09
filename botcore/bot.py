@@ -53,6 +53,12 @@ class Bot(commands.Bot):
         self.queued_commands = list()
         super().__init__(command_prefix, help_command=None)
 
+    def bot_check(self, ctx):
+        bot_channel_id = 708715939486498937
+        if (bot_channel := ctx.guild.get_channel(bot_channel_id)):
+            return ctx.channel.id == bot_channel.id or ctx.channel.permissions_for(ctx.author).manage_messages
+        return True
+
     async def on_ready(self):
         """Alerts the user that the bot is initialized
         
@@ -106,7 +112,7 @@ class Bot(commands.Bot):
         """
 
         if isinstance(exception, commands.CheckFailure):
-            return
+            return await ctx.send(f'Please use this command in the bot channel, {ctx.author.mention}.', delete_after=5.0)
 
         error_message = f'Unhandled exception by: {ctx.author.name}\n' \
                         f'Message:                {ctx.message.content}\n'
