@@ -223,38 +223,44 @@ class FAQ(commands.Cog):
             raw_command = message.content.lower()[1::].split(' ')
             command = raw_command[0]
             if self.bot.get_command(command):
+                # this means it's a bot command, not a faq command
                 return
-            
-            bot_channel_id = 708715939486498937
-            if (bot_channel := message.guild.get_channel(bot_channel_id)):
-                if command in self.faq_commands:
-                    if message.channel.id == bot_channel.id or bot_channel.permissions_for(message.author).manage_messages:
-                        return await message.channel.send(self.faq_commands[command])
-                    else:
-                        return await message.channel.send(f'Please use this command in the bot channel, {message.author.mention}.', delete_after=5.0)
-                elif command not in self.faq_commands:
-                    if message.channel.id == bot_channel.id or bot_channel.permissions_for(message.author).manage_messages:
-                        closest_commands = await self.get_closest_commands(command)
-                        if len(closest_commands) > 0:
-                            cmds = ', '.join([ f'**{command}**' for command in closest_commands ])
-                            return await message.channel.send(f'Did you mean... {cmds}?')
+
+            channel = message.channel
+            guild = message.guild
+            author = message.author
+
+            if not any((guild, (bot_channel := guild.get_channel(708715939486498937)))):
+                # message sent in a DM channel or some other guild than Windia
+                if guild:
+                    return await self.process_faq_command(command, channel)
+                else:
+                    return await self.process_faq_command(command, author)
+
+            if not any((channel.id == bot_channel.id, bot_channel.permissions_for(author).manage_messages)):
+                # the command was attempted to be invoked by a non-mod in some channel besides the bot channel
+                return await channel.send(f'Please use this command in the bot channel, {author.mention}.', delete_after=5.0)
+
+            return await self.process_faq_command(command, channel)
+
+    async def process_faq_command(self, command: str, messageable: discord.abc.Messageable):
+        if command in self.faq_commands:
+            return await messageable.send(self.faq_commands[command])
+        elif command not in self.faq_commands:
+            closest_commands = await self.get_closest_commands(command)
+            if len(closest_commands) > 0:
+                cmds = ', '.join([ f'**{command}**' for command in closest_commands ])
+                return await messageable.send(f'Did you mean... {cmds}?')
 
     async def get_closest_commands(self, cmd: str):
         if len(cmd) < 2:
             return []
 
-        all_commands = list(self.faq_commands.keys()) + [ command.name for command in list(self.bot.commands) ]
-        closest_commands = []
+        def __get_closest_commands():
+            all_commands = list(self.faq_commands.keys()) + [ command.name for command in list(self.bot.commands) ]
+            return [ command for command in all_commands if cmd in command or difflib.SequenceMatcher(None, cmd, command).ratio() > min(0.8, 1.0 - 1/len(cmd)) ]
 
-        async def iter_commands():
-            for command in all_commands:
-                if cmd in command or difflib.SequenceMatcher(None, cmd, command).ratio() > min(0.8, 1.0 - 1/len(cmd)):
-                    closest_commands.append(command)
-        
-        future = asyncio.ensure_future(iter_commands())
-        await asyncio.wait([future], return_when=asyncio.ALL_COMPLETED)
-
-        return closest_commands
+        return await self.bot.loop.run_in_executor(None, __get_closest_commands)
 
 def setup(bot):
     """Adds the cog to the Discord Bot
