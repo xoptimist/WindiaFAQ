@@ -230,12 +230,11 @@ class FAQ(commands.Cog):
             guild = message.guild
             author = message.author
 
-            if not any((guild, (bot_channel := guild.get_channel(708715939486498937)))):
-                # message sent in a DM channel or some other guild than Windia
-                if guild:
-                    return await self.process_faq_command(command, channel)
-                else:
-                    return await self.process_faq_command(command, author)
+            if not guild:
+                return await self.process_faq_command(command, author)
+
+            elif not (bot_channel := guild.get_channel(708715939486498937)):
+                return await self.process_faq_command(command, channel)
 
             if not any((channel.id == bot_channel.id, bot_channel.permissions_for(author).manage_messages)):
                 # the command was attempted to be invoked by a non-mod in some channel besides the bot channel
