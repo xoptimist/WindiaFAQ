@@ -53,12 +53,6 @@ class Bot(commands.Bot):
         self.queued_commands = list()
         super().__init__(command_prefix, help_command=None)
 
-    def bot_check(self, ctx):
-        bot_channel_id = 708715939486498937
-        if (bot_channel := ctx.guild.get_channel(bot_channel_id)):
-            return ctx.channel.id == bot_channel.id or ctx.channel.permissions_for(ctx.author).manage_messages
-        return True
-
     async def on_ready(self):
         """Alerts the user that the bot is initialized
         
