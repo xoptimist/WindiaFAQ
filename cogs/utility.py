@@ -149,8 +149,13 @@ class Utility(commands.Cog):
 
     @commands.command(name='time', description='Displays the server time')
     async def time_command(self, ctx):
-        fmt_time = datetime.utcnow().strftime('%H:%M:%S %d %b, %Y')
-        return await ctx.send(f'The server\'s current time is {fmt_time}.')
+        fmt_time = datetime.utcnow().strftime('%H:%M:%S, %d %b, %Y')
+        return await ctx.send(f'The server\'s current time is {fmt_time} UTC-0.')
+
+    def cog_check(self, ctx):
+        if (bot_channel := ctx.guild.get_channel(708715939486498937)):
+            return ctx.channel.id == bot_channel.id or ctx.channel.permissions_for(ctx.author).manage_messages
+        return True
 
 def setup(bot):
     """Adds the cog to the Discord Bot
