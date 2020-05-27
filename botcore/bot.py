@@ -4,6 +4,8 @@ import traceback
 import discord.utils
 from discord.ext import tasks, commands
 
+from typing import Tuple
+
 
 class Bot(commands.Bot):
     """The Windia FAQ Bot base
@@ -173,3 +175,14 @@ class Bot(commands.Bot):
 
         await self.wait_until_ready()
         print('Command Processing started')
+
+    async def send_embed(self, title: str, description: str, messageable: discord.abc.Messageable, author: discord.Member, *fields: Tuple[str, str]):
+        embed = discord.Embed(title=title, description=description)
+        embed.set_author(name=f'{author}', icon_url=author.avatar_url)
+        embed.set_footer(text='Send FAQ suggestions to your nearest staff member and everything else to thewallacems '
+                              'on GitHub :)')
+
+        for name, value in fields:
+            embed.add_field(name=name, value=value)
+
+        return await messageable.send(embed=embed)

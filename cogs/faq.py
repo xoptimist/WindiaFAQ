@@ -232,21 +232,21 @@ class FAQ(commands.Cog):
             author = message.author
 
             if not guild:
-                return await self.process_faq_command(command, author)
+                return await self.process_faq_command(command, author, author)
 
             elif not (bot_channel := guild.get_channel(708715939486498937)):
-                return await self.process_faq_command(command, channel)
+                return await self.process_faq_command(command, channel, author)
 
             if not any((channel.id == bot_channel.id, bot_channel.permissions_for(author).manage_messages)):
                 # the command was attempted to be invoked by a non-mod in some channel besides the bot channel
                 return await channel.send(f'Please use this command in the bot channel, {author.mention}.',
                                           delete_after=5.0)
 
-            return await self.process_faq_command(command, channel)
+            return await self.process_faq_command(command, channel, author)
 
-    async def process_faq_command(self, command: str, messageable: discord.abc.Messageable):
+    async def process_faq_command(self, command: str, messageable: discord.abc.Messageable, author: discord.Member):
         if command in self.faq_commands:
-            return await messageable.send(self.faq_commands[command])
+            return await self.bot.send_embed(command, self.faq_commands[command], messageable, author)
         elif command not in self.faq_commands:
             closest_commands = await self.get_closest_commands(command)
             if len(closest_commands) > 0:

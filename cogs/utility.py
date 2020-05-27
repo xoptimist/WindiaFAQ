@@ -49,13 +49,14 @@ class Utility(commands.Cog):
         """
 
         member = member or ctx.author
+        messageable = ctx.channel or ctx.author
 
-        id = member.id
-        mention = member.mention
-
-        return await ctx.send(
-            f'{mention}, your Discord ID is `{id}`\nType `@discord` in game and then enter this ID into the text box '
-            f'to link your in-game account to your Discord account.'
+        return await self.bot.send_embed(
+            f'{member.display_name}\'s Discord ID: {member.id}',
+            f'Type `@discord` in game and then enter this ID into the text box '
+            f'to link your in-game account to your Discord account.',
+            messageable,
+            ctx.author
         )
 
     @commands.command(name='online', description='Displays the online count')
@@ -72,15 +73,17 @@ class Utility(commands.Cog):
         if isinstance(ctx.guild, discord.DMChannel):
             return await ctx.send('This command may only be used in the Windia Discord.')
 
+        message = 'I am currently unable to get the online count, sorry!'
+
         if windia_bot := ctx.guild.get_member(614221348780113920):
             activity = windia_bot.activity
             online_count = int(activity.name.split(' ')[3])
             if online_count < 4:
-                return await ctx.send(f'The server is currently **offline**.')
+                message = f'The server is currently **offline**.'
             else:
-                return await ctx.send(f'The server is currently **online** with {online_count} players.')
-        else:
-            return await ctx.send('I am currently unable to get the online count, sorry!')
+                message = f'The server is currently **online** with {online_count} players.'
+
+        return await self.bot.send_embed('Is Windia online?', message, ctx.channel, ctx.author)
 
     # REMINDER: Check the flags repo
     @commands.command(name='magic', description='Shows how much magic needed to one shot a monster')
@@ -97,7 +100,7 @@ class Utility(commands.Cog):
                 f'Example Usage: {self.bot.command_prefix}magic 43376970 570 -asle'
             )
 
-            return await ctx.send(message)
+            return await self.bot.send_embed('Magic Usage', message, ctx.channel or ctx.author, ctx.author)
 
         if not hp:
             return await ctx.send(
@@ -112,10 +115,7 @@ class Utility(commands.Cog):
             except ValueError:
                 return await ctx.send(f'HP and Spell Attack values must be an integer.')
 
-        message = (
-            f'```\n'
-            f'Spell Attack: {spellatk}\n'
-        )
+        modifiers_msg = f'Spell Attack: {spellatk}\n'
 
         staff = 1.0
         elemental = 1.0
@@ -124,19 +124,20 @@ class Utility(commands.Cog):
         if args:
             if re.search(r'-[^l]*([ls])[^l]*', args):  # loveless or elemental staff
                 staff = 1.25
-                message += f'Staff Multiplier: {staff}x\n'
+                modifiers_msg += f'Staff Multiplier: {staff}x\n'
             if re.search(r'-[^e]*e[^e]*', args):  # elemental advantage
                 elemental = 1.5
-                message += f'Elemental Advantage: {elemental}x\n'
+                modifiers_msg += f'Elemental Advantage: {elemental}x\n'
             elif re.search(r'-[^d]*d[^d]*', args):  # elemental disadvantage
                 elemental = 0.5
-                message += f'Elemental Disadvantage: {elemental}x\n'
+                modifiers_msg += f'Elemental Disadvantage: {elemental}x\n'
 
         x = Symbol('x')
+        magic_msg = ''
 
         if args and re.search(r'-[^a]*a[^a]*', args):  # elemental amp
-            message += f'BW Elemental Amp: 1.3x\n'
-            message += f'FP/IL Elemental Amp: 1.4x\n\n'
+            modifiers_msg += f'BW Elemental Amp: 1.3x\n'
+            modifiers_msg += f'FP/IL Elemental Amp: 1.4x\n\n'
 
             # F/P and I/L
             amp = 1.4
@@ -144,7 +145,7 @@ class Utility(commands.Cog):
                                             x ** 2) / 1000.0 + x * mastery * 0.9) / 30.0 + x / 200.0)) * spellatk) * amp) * staff) * elemental) / hp - 1.0,
                              x)
             fpil_magic = min([math.ceil(num) for num in solution if num >= 0.0])
-            message += f'Magic for F/P or I/L: {fpil_magic}\n'
+            magic_msg += f'Magic for F/P or I/L: {fpil_magic}\n'
 
             # BW
             amp = 1.3
@@ -152,20 +153,22 @@ class Utility(commands.Cog):
                                             x ** 2) / 1000.0 + x * mastery * 0.9) / 30.0 + x / 200.0)) * spellatk) * amp) * staff) * elemental) / hp - 1.0,
                              x)
             bw_magic = min([math.ceil(num) for num in solution if num >= 0.0])
-            message += f'Magic for BW: {bw_magic}```'
+            magic_msg += f'Magic for BW: {bw_magic}```'
         else:
             solution = solve((((((((
                                            x ** 2) / 1000.0 + x * mastery * 0.9) / 30.0 + x / 200.0)) * spellatk) * staff) * elemental) / hp - 1.0,
                              x)
             magic = min([math.ceil(num) for num in solution if num >= 0.0])
-            message += f'\nMagic: {magic}```'
+            magic_msg += f'\nMagic: {magic}```'
 
-        return await ctx.send(message)
+        return await self.bot.send_embed('Magic Calculator', f'The Magic required to one-hit a monster with {hp} HP', ctx.channel or ctx.author, ctx.author,
+                                         ('Modifiers', modifiers_msg),
+                                         ('Magic Required', magic_msg))
 
     @commands.command(name='time', description='Displays the server time')
     async def time_command(self, ctx):
         fmt_time = datetime.utcnow().strftime('%H:%M:%S, %d %b, %Y')
-        return await ctx.send(f'The server\'s current time is {fmt_time} UTC-0.')
+        return await self.bot.send_embed(f'The server\'s current time is {fmt_time} UTC-0.', '', ctx.channel or ctx.author, ctx.author)
 
     def cog_check(self, ctx):
         if ctx.guild and (bot_channel := ctx.guild.get_channel(708715939486498937)):
@@ -175,7 +178,7 @@ class Utility(commands.Cog):
 
 def setup(bot):
     """Adds the cog to the Discord Bot
-    
+
     This is not called directly; it is called when the Bot
     called the load_extension function on a cog file path.
     """

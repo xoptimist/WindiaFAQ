@@ -77,7 +77,7 @@ FAQ Commands
                 messages.append(help)
                 help = '\n'
 
-            help += f'{command}\n'
+            help += f'{command} | '
 
         help += '```'
 
@@ -86,9 +86,10 @@ FAQ Commands
         for message in messages:
             try:
                 await ctx.author.send(message)
-                return await ctx.send('I have DMed you a list of commands.', delete_after=5.0)
             except discord.Forbidden:
                 return await ctx.send('I could not DM you a list of commands since you are not accepting DMs from me.')
+
+        return await ctx.send('I have DMed you a list of commands.', delete_after=5.0)
 
 
 def setup(bot):
