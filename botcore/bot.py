@@ -1,4 +1,5 @@
 import asyncio
+import re
 import traceback
 
 import discord.utils
@@ -181,6 +182,21 @@ class Bot(commands.Bot):
         embed.set_author(name=f'{author}', icon_url=author.avatar_url)
         embed.set_footer(text='Send FAQ suggestions to your nearest staff member and everything else to thewallacems '
                               'on GitHub :)')
+
+        # regex to check if any image url is in the description
+        regex = re.compile(
+            r'^(?:http|ftp)s?://'  # http:// or https://
+            r'(?:(?:[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?\.)+(?:[A-Z]{2,6}\.?|[A-Z0-9-]{2,}\.?)|'  # domain...
+            r'localhost|'  # localhost...
+            r'\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})'  # ...or ip
+            r'(?::\d+)?'  # optional port
+            r'(?:/?|[/?]\S+)$', re.IGNORECASE)
+
+        if match := re.match(regex, description):
+            for m in match.groups():
+                if re.match(r'\.(jpg|png|jpeg)/?$', m.lower()):
+                    embed.set_image(url=m)
+                    break
 
         for name, value in fields:
             embed.add_field(name=name, value=value)
