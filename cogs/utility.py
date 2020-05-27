@@ -153,13 +153,13 @@ class Utility(commands.Cog):
                                             x ** 2) / 1000.0 + x * mastery * 0.9) / 30.0 + x / 200.0)) * spellatk) * amp) * staff) * elemental) / hp - 1.0,
                              x)
             bw_magic = min([math.ceil(num) for num in solution if num >= 0.0])
-            magic_msg += f'Magic for BW: {bw_magic}```'
+            magic_msg += f'Magic for BW: {bw_magic}'
         else:
             solution = solve((((((((
                                            x ** 2) / 1000.0 + x * mastery * 0.9) / 30.0 + x / 200.0)) * spellatk) * staff) * elemental) / hp - 1.0,
                              x)
             magic = min([math.ceil(num) for num in solution if num >= 0.0])
-            magic_msg += f'\nMagic: {magic}```'
+            magic_msg += f'\nMagic: {magic}'
 
         return await self.bot.send_embed('Magic Calculator', f'The Magic required to one-hit a monster with {hp} HP', ctx.channel or ctx.author, ctx.author,
                                          ('Modifiers', modifiers_msg),
