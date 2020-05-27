@@ -1,14 +1,15 @@
-from discord.ext import tasks, commands
-import asyncio
-import botcore
-import discord
 import difflib
-import os.path
+
+import discord
+from discord.ext import commands
+
+import botcore
 import windiautils
+
 
 class FAQ(commands.Cog):
     """A cog used for the Windia FAQ and managing the Windia FAQ
-        
+
     Members
     -------
     bot: botcore.Bot
@@ -78,7 +79,7 @@ class FAQ(commands.Cog):
             return await ctx.send('Please enter a description for the command.')
         elif command in self.faq_commands or self.bot.get_command(command):
             return await ctx.send(f'{command} is already a registered command.')
-            
+
         self.faq_commands[command.lower()] = description
         windiautils.save_commands(self.faq_commands)
         return await ctx.send(f'{command} was added.')
@@ -107,11 +108,11 @@ class FAQ(commands.Cog):
 
         if not command:
             return await ctx.send('Please enter a command to update.')
-        elif not command in self.faq_commands:
+        elif command not in self.faq_commands:
             return await ctx.send(f'{command} is not a registered command.')
         elif not description:
             return await ctx.send('Please enter a description for the command.')
-        
+
         self.faq_commands[command.lower()] = description
         windiautils.save_commands(self.faq_commands)
         return await ctx.send(f'{command} was updated.')
@@ -170,9 +171,9 @@ class FAQ(commands.Cog):
 
         if not command:
             return await ctx.send('Please enter a command to remove.')
-        elif not command in self.faq_commands:
+        elif command not in self.faq_commands:
             return await ctx.send(f'{command} is not a registered command.')
-            
+
         self.faq_commands.pop(command)
         windiautils.save_commands(self.faq_commands)
         return await ctx.send(f'{command} was removed.')
@@ -238,7 +239,8 @@ class FAQ(commands.Cog):
 
             if not any((channel.id == bot_channel.id, bot_channel.permissions_for(author).manage_messages)):
                 # the command was attempted to be invoked by a non-mod in some channel besides the bot channel
-                return await channel.send(f'Please use this command in the bot channel, {author.mention}.', delete_after=5.0)
+                return await channel.send(f'Please use this command in the bot channel, {author.mention}.',
+                                          delete_after=5.0)
 
             return await self.process_faq_command(command, channel)
 
@@ -248,7 +250,7 @@ class FAQ(commands.Cog):
         elif command not in self.faq_commands:
             closest_commands = await self.get_closest_commands(command)
             if len(closest_commands) > 0:
-                cmds = ', '.join([ f'**{command}**' for command in closest_commands ])
+                cmds = ', '.join([f'**{command}**' for command in closest_commands])
                 return await messageable.send(f'Did you mean... {cmds}?')
 
     async def get_closest_commands(self, cmd: str):
@@ -256,10 +258,13 @@ class FAQ(commands.Cog):
             return []
 
         def __get_closest_commands():
-            all_commands = list(self.faq_commands.keys()) + [ command.name for command in list(self.bot.commands) ]
-            return [ command for command in all_commands if cmd in command or difflib.SequenceMatcher(None, cmd, command).ratio() > min(0.8, 1.0 - 1/len(cmd)) ]
+            all_commands = list(self.faq_commands.keys()) + [command.name for command in list(self.bot.commands)]
+            return [command for command in all_commands if
+                    cmd in command or difflib.SequenceMatcher(None, cmd, command).ratio() > min(0.8,
+                                                                                                1.0 - 1 / len(cmd))]
 
         return await self.bot.loop.run_in_executor(None, __get_closest_commands)
+
 
 def setup(bot):
     """Adds the cog to the Discord Bot

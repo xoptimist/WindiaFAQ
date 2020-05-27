@@ -1,7 +1,9 @@
-from discord.ext import tasks, commands
-import botcore
 import os
-import sys
+
+from discord.ext import commands
+
+import botcore
+
 
 class Admin(commands.Cog):
     """A cog to do admin errands such as loading/unloading other cogs
@@ -143,15 +145,15 @@ class Admin(commands.Cog):
         except commands.ExtensionNotLoaded:
             await ctx.send(f'{cog} not loaded.')
 
-    @commands.command(name='logout', hidden=True)
-    async def logout(self, ctx: commands.Context):
-        """Attempts to logout of discord
+    @commands.command(name='restart', hidden=True)
+    async def restart(self, ctx: commands.Context):
+        """Attempts to restart the bot
         
-        await logout(ctx: discord.ext.commands.Context)
+        await restart(ctx: discord.ext.commands.Context)
 
         This is a coroutine. This is not called directly; it is called whenever
-        a user attempts to use the `$logout` command. If this command passes the
-        cog check, the bot will log out.
+        a user attempts to use the `restart` command. If this command passes the
+        cog check, the bot will restart.
 
         Parameters
         ----------
@@ -159,9 +161,8 @@ class Admin(commands.Cog):
             The context in which the command was sent
         """
 
-        await ctx.send('Goodbye!')
-        await self.bot.logout()
-        sys.exit(0)
+        await ctx.send('Restarting')
+        await self.bot.close()
 
     def cog_check(self, ctx: commands.Context):
         """Checks if the user attempting to invoke any admin commands is the owner of the bot
@@ -181,23 +182,12 @@ class Admin(commands.Cog):
 
         return self.bot.is_owner(ctx.author)
 
-    @commands.command(name='restart', hidden=True)
-    async def restart(self, ctx):
-        """Restarts the bot's script"""
-        await ctx.send('Restarting')
-
-        if os.name == 'nt':
-            os.system('py .')
-        else:
-            os.system('python3.8 .')
-
-        await self.bot.logout()
-
     @commands.command(name='pull', hidden=True)
     async def update_bot(self, ctx):
         """Updates the bot"""
         await ctx.send('Updating')
         os.system('git pull')
+
 
 def setup(bot):
     """Adds the cog to the Discord Bot

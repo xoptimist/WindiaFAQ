@@ -1,7 +1,9 @@
-from discord.ext import tasks, commands
-import botcore
 import discord
+from discord.ext import commands
+
+import botcore
 import windiautils
+
 
 class Help(commands.Cog):
     """A cog used for the Help command
@@ -44,7 +46,7 @@ class Help(commands.Cog):
         ctx: discord.ext.commands.Context
             The context of the command sent by the user
         """
-        
+
         messages = list()
 
         help = '''```Here is our list of commands
@@ -62,7 +64,7 @@ Utility Commands
             if len(help) > 1900:
                 messages.append(help)
                 help = '\n'
-                
+
             help += f'{command.name} - {command.description}\n'
 
         help += '''
@@ -74,7 +76,7 @@ FAQ Commands
             if len(help) > 1900:
                 messages.append(help)
                 help = '\n'
-                
+
             help += f'{command}\n'
 
         help += '```'
@@ -87,6 +89,7 @@ FAQ Commands
                 return await ctx.send('I have DMed you a list of commands.', delete_after=5.0)
             except discord.Forbidden:
                 return await ctx.send('I could not DM you a list of commands since you are not accepting DMs from me.')
+
 
 def setup(bot):
     """Adds the cog to the Discord Bot

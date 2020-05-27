@@ -1,11 +1,8 @@
-from discord.ext import tasks, commands
-
 import asyncio
-import discord
-import discord.utils
-import json
-import os.path
 import traceback
+
+import discord.utils
+from discord.ext import tasks, commands
 
 
 class Bot(commands.Bot):
@@ -60,28 +57,28 @@ class Bot(commands.Bot):
 
         This is a coroutine. This is not called directly; it is fired whenever the
         bot is logged into Discord and is ready for use."""
-        
+
         print(f'{self.user.name} connected.')
 
     async def on_error(self, event: str, *args, **kwargs):
-       """Prints unhandled errors to console
-        
-       await on_error(event: str, *args, **kwargs)
+        """Prints unhandled errors to console
 
-       This is a coroutine. This is not called directly; it is fired whenever the
-       bot catches an exception that is unhandled. This event prints an error
-       message to the console.
+        await on_error(event: str, *args, **kwargs)
 
-       TODO: Add logging to a Discord channel.
+        This is a coroutine. This is not called directly; it is fired whenever the
+        bot catches an exception that is unhandled. This event prints an error
+        message to the console.
 
-       Parameters
-       ----------
+        TODO: Add logging to a Discord channel.
 
-       event: str
-           The event method's name that caused the exception.
-       """
-       
-       traceback.print_exc()
+        Parameters
+        ----------
+
+        event: str
+            The event method's name that caused the exception.
+        """
+
+        traceback.print_exc()
 
     async def on_command_error(self, ctx: commands.Context, exception: commands.CommandError):
         """Prints unhandled command errors to console.
@@ -106,10 +103,11 @@ class Bot(commands.Bot):
         """
 
         if isinstance(exception, commands.CheckFailure):
-            return await ctx.send(f'Please use this command in the bot channel, {ctx.author.mention}.', delete_after=5.0)
+            return await ctx.send(f'Please use this command in the bot channel, {ctx.author.mention}.',
+                                  delete_after=5.0)
 
         error_message = f'Unhandled exception by: {ctx.author.name}\n' \
-                        f'Message:                {ctx.message.content}\n'
+                        f'Message: {ctx.message.content}\n'
 
         print(error_message)
         traceback.print_exc()
@@ -138,7 +136,7 @@ class Bot(commands.Bot):
         if message.content.startswith(self.command_prefix):
             raw_command = message.content.lower()[1::].split(' ')
             command = raw_command[0]
-            
+
             if self.get_command(command):
                 task = asyncio.create_task(self.process_commands(message))
                 self.queued_commands.append(task)
@@ -157,8 +155,10 @@ class Bot(commands.Bot):
         from the users of its guilds. This is a First-In-First-Out process.
         """
 
-        if len(self.queued_commands) > 0: await self.queued_commands.pop(0)
-        else: self.dequeue_commands.cancel()
+        if len(self.queued_commands) > 0:
+            await self.queued_commands.pop(0)
+        else:
+            self.dequeue_commands.cancel()
 
     @dequeue_commands.before_loop
     async def before_dequeue_commands(self):

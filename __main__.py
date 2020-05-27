@@ -6,14 +6,15 @@ Discord Bot, then runs the WindiaFAQ Bot using the Token stored in
 the .env file.
 """
 
-from botcore import Bot
-from dotenv import load_dotenv
-from discord.ext import commands
-import discord.errors
-import os
 import os.path
 import sys
 import traceback
+
+import discord.errors
+from discord.ext import commands
+from dotenv import load_dotenv
+
+from botcore import Bot
 
 if not os.path.exists('./.env'):
     print('No .env file could be found!')
@@ -37,26 +38,25 @@ if not token or token == '':
     print('EX: TOKEN = \'TOKEN\'')
     sys.exit(0)
 
+bot = Bot(prefix)
 cogs_path = './cogs'
 if os.path.exists(cogs_path):
-    cogs = [ f'cogs.{file[:-3]}' for file in os.listdir(cogs_path) if file.endswith('.py') ]
+    cogs = [f'cogs.{file[:-3]}' for file in os.listdir(cogs_path) if file.endswith('.py')]
 
-bot = Bot(prefix)
-
-for cog in cogs:
-    try:
-        bot.load_extension(cog)
-        print(f'{cog} loaded.')
-    except commands.ExtensionAlreadyLoaded:
-        print(f'{cog} is already loaded.')
-    except commands.ExtensionNotFound:
-        print(f'{cog} not found.')
-    except commands.NoEntryPointError:
-        print(f'{cog} has no setup function.')
-    except:
-        print(f'An unhandled error was thrown while loading {cog}')
-        traceback.print_exc()
-        continue
+    for cog in cogs:
+        try:
+            bot.load_extension(cog)
+            print(f'{cog} loaded.')
+        except commands.ExtensionAlreadyLoaded:
+            print(f'{cog} is already loaded.')
+        except commands.ExtensionNotFound:
+            print(f'{cog} not found.')
+        except commands.NoEntryPointError:
+            print(f'{cog} has no setup function.')
+        except:
+            print(f'An unhandled error was thrown while loading {cog}')
+            traceback.print_exc()
+            continue
 
 try:
     bot.run(token, reconnect=True)
