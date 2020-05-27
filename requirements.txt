@@ -4,9 +4,9 @@ attrs==19.3.0
 chardet==3.0.4
 discord.py==1.2.5
 idna==2.8
+mpmath==1.1.0
 multidict==4.7.3
-pip==19.2.3
-setuptools==41.2.0
+python-dotenv==0.10.3
+sympy==1.6
 websockets==6.0
 yarl==1.4.2
-python-dotenv==0.10.3
