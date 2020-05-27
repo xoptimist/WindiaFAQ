@@ -51,8 +51,13 @@ class FAQ(commands.Cog):
         self.bot: botcore.Bot = bot
         self.faq_commands: dict = windiautils.load_commands()
 
-    @commands.command(name='add', hidden=True)
-    async def add_command(self, ctx: commands.Context, command: str = None, *, description: str = None):
+    @commands.command(
+        name='add',
+        description='Adds a new FAQ command',
+        usage='`FAQ command: string` `description: string`',
+        hidden=True
+    )
+    async def add_command(self, ctx: commands.Context, command: str, *, description: str):
         """Attempts to add a new FAQ command
         
         await update_command(ctx: commands.context[, command: str = None, description: str = None])
@@ -66,26 +71,27 @@ class FAQ(commands.Cog):
         ctx: discord.ext.commands.Context
             The context of the message sent by the user
 
-        [command: str = None]
+        command: str = None
             The FAQ command to be added
 
-        [description: str = None]
+        description: str = None
             The description for the given FAQ command
         """
 
-        if not command:
-            return await ctx.send('Please enter a command to add.')
-        elif not description:
-            return await ctx.send('Please enter a description for the command.')
-        elif command in self.faq_commands or self.bot.get_command(command):
+        if command in self.faq_commands or self.bot.get_command(command):
             return await ctx.send(f'{command} is already a registered command.')
 
         self.faq_commands[command.lower()] = description
         windiautils.save_commands(self.faq_commands)
         return await ctx.send(f'{command} was added.')
 
-    @commands.command(name='update', hidden=True)
-    async def update_command(self, ctx: commands.Context, command: str = None, *, description: str = None):
+    @commands.command(
+        name='update',
+        description='Updates a FAQ command',
+        usage='`FAQ command: string` `new description: string`',
+        hidden=True
+    )
+    async def update_command(self, ctx: commands.Context, command: str, *, description: str):
         """Attempts to update an existing FAQ command
         
         await update_command(ctx: commands.context[, command: str = None, description: str = None])
@@ -99,26 +105,27 @@ class FAQ(commands.Cog):
         ctx: discord.ext.commands.Context
             The context of the message sent by the user
 
-        [command: str = None]
+        command: str = None
             The FAQ command to be updated
 
-        [description: str = None]
+        description: str = None
             The new description for the given FAQ command
         """
 
-        if not command:
-            return await ctx.send('Please enter a command to update.')
-        elif command not in self.faq_commands:
+        if command not in self.faq_commands:
             return await ctx.send(f'{command} is not a registered command.')
-        elif not description:
-            return await ctx.send('Please enter a description for the command.')
 
         self.faq_commands[command.lower()] = description
         windiautils.save_commands(self.faq_commands)
         return await ctx.send(f'{command} was updated.')
 
-    @commands.command(name='alias', hidden=True)
-    async def alias_command(self, ctx: commands.Context, command: str = None, alias: str = None):
+    @commands.command(
+        name='alias',
+        description='Aliases a FAQ command',
+        usage='`FAQ command: string` `alias: string`',
+        hidden=True
+    )
+    async def alias_command(self, ctx: commands.Context, command: str, alias: str):
         """Attempts to alias an existing FAQ command
         
         await update_command(ctx: commands.context[, command: str = None, alias: str = None])
@@ -132,16 +139,14 @@ class FAQ(commands.Cog):
         ctx: discord.ext.commands.Context
             The context of the message sent by the user
 
-        [command: str = None]
+        command: str = None
             The FAQ command to be updated
 
-        [alias: str = None]
+        alias: str = None
             The new alias for the given FAQ command
         """
 
-        if not command or not alias:
-            return await ctx.send(f'Please add a command and an alias for it')
-        elif not command in self.faq_commands:
+        if command not in self.faq_commands:
             return await ctx.send(f'{command} is not a registered command.')
         elif alias in self.faq_commands:
             return await ctx.send(f'{alias} is already a registered command.')
@@ -150,8 +155,13 @@ class FAQ(commands.Cog):
         windiautils.save_commands(self.faq_commands)
         return await ctx.send(f'The alias {alias} has been added to {command}.')
 
-    @commands.command(name='remove', hidden=True)
-    async def remove_command(self, ctx: commands.Context, command: str = None):
+    @commands.command(
+        name='remove',
+        description='Removes a FAQ command',
+        usage='`FAQ command: string`',
+        hidden=True
+    )
+    async def remove_command(self, ctx: commands.Context, command: str):
         """Attempts to remove an existing FAQ command
         
         await remove_command(ctx: commands.context[, command: str = None])
@@ -165,13 +175,11 @@ class FAQ(commands.Cog):
         ctx: discord.ext.commands.Context
             The context of the message sent by the user
 
-        [command: str = None]
+        command: str
             The FAQ command to be removed
         """
 
-        if not command:
-            return await ctx.send('Please enter a command to remove.')
-        elif command not in self.faq_commands:
+        if command not in self.faq_commands:
             return await ctx.send(f'{command} is not a registered command.')
 
         self.faq_commands.pop(command)

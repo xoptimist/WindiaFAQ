@@ -30,7 +30,12 @@ class Help(commands.Cog):
 
         self.bot: botcore.Bot = bot
 
-    @commands.command(name='help', hidden=True)
+    @commands.command(
+        name='help',
+        description='Displays bot commands and FAQ commands',
+        usage='',
+        hidden=True
+    )
     async def help_command(self, ctx: commands.Context):
         """DMs the user invoking the command the list of commands
         

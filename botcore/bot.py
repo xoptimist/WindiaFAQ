@@ -63,58 +63,6 @@ class Bot(commands.Bot):
 
         print(f'{self.user.name} connected.')
 
-    async def on_error(self, event: str, *args, **kwargs):
-        """Prints unhandled errors to console
-
-        await on_error(event: str, *args, **kwargs)
-
-        This is a coroutine. This is not called directly; it is fired whenever the
-        bot catches an exception that is unhandled. This event prints an error
-        message to the console.
-
-        TODO: Add logging to a Discord channel.
-
-        Parameters
-        ----------
-
-        event: str
-            The event method's name that caused the exception.
-        """
-
-        traceback.print_exc()
-
-    async def on_command_error(self, ctx: commands.Context, exception: commands.CommandError):
-        """Prints unhandled command errors to console.
-        
-        await on_command_error(ctx: discord.ext.commands.Context,
-                               exception: discord.ext.commands.CommandError)
-
-        This is a coroutine. This is not called directly; it is fired whenever the
-        bot catches an exception in a command that is unhandled. This event prints
-        an error message to the console.
-        
-        TODO: Add logging to a Discord channel.
-        
-        Parameters
-        ----------
-
-        ctx: discord.ext.commands.Context
-            The context of the message that threw the exception
-
-        exception: discord.ext.commands.CommandError
-            The exception that was thrown
-        """
-
-        if isinstance(exception, commands.CheckFailure):
-            return await ctx.send(f'Please use this command in the bot channel, {ctx.author.mention}.',
-                                  delete_after=5.0)
-
-        error_message = f'Unhandled exception by: {ctx.author.name}\n' \
-                        f'Message: {ctx.message.content}\n'
-
-        print(error_message)
-        traceback.print_exc()
-
     async def on_message(self, message: discord.Message):
         """An event thrown when a user sends a message in the bot's guilds, used for command handling.
 
@@ -145,6 +93,25 @@ class Bot(commands.Bot):
                 self.queued_commands.append(task)
                 if not self.dequeue_commands.get_task():
                     self.dequeue_commands.start()
+
+    async def log(self, event: str, *messages: Tuple[str, str]):
+        # add config to this bot later (: just copy pasted from my other bot
+        if channel := self.get_channel(714581563022770218):
+            embed = discord.Embed(title=event, description='', color=discord.Color.purple())
+
+            for name, value in messages:
+                embed.add_field(name=name, value=value)
+
+            return await channel.send(embed=embed)
+        else:
+            print()
+            print('----------------------------------')
+            print(event)
+
+            for name, value in messages:
+                print(f'{name}: {value}')
+
+            print('----------------------------------')
 
     @tasks.loop(seconds=1/2)
     async def dequeue_commands(self):

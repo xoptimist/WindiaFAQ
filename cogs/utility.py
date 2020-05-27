@@ -34,7 +34,11 @@ class Utility(commands.Cog):
 
         self.bot: botcore.Bot = bot
 
-    @commands.command(name='id', description='Displays your Discord ID to link to Windia', usage=f'id [<user mention>]')
+    @commands.command(
+        name='id',
+        description='Displays your Discord ID to link to Windia',
+        usage=f'`optional user mention: ping`'
+    )
     async def id_command(self, ctx: commands.Context, member: discord.Member = None):
         """Tells a user their Discord ID
         
@@ -57,7 +61,11 @@ class Utility(commands.Cog):
             ctx.author
         )
 
-    @commands.command(name='online', description='Displays the online count')
+    @commands.command(
+        name='online',
+        description='Displays the online count',
+        usage=''
+    )
     async def online_command(self, ctx: commands.Context):
         """Displays the online count for Windia
         
@@ -84,8 +92,12 @@ class Utility(commands.Cog):
         return await self.bot.send_embed('Is Windia online?', message, ctx.channel, ctx.author)
 
     # REMINDER: Check the flags repo
-    @commands.command(name='magic', description='Shows how much magic needed to one shot a monster')
-    async def magic_command(self, ctx, hp=None, spellatk=None, *, args=None):
+    @commands.command(
+        name='magic',
+        description='Shows how much magic needed to one shot a monster',
+        usage='`monster hp: integer` `spell attack: integer` `args: -[alsed]`'
+    )
+    async def magic_command(self, ctx, hp: int, spellatk: int, *, args=None):
         if not hp and not spellatk and not args:
             message = (
                 f'Usage: {self.bot.command_prefix}{ctx.invoked_with} <hp> <spell attack> <args>\n'
@@ -99,19 +111,6 @@ class Utility(commands.Cog):
             )
 
             return await self.bot.send_embed('Magic Usage', message, ctx.channel or ctx.author, ctx.author)
-
-        if not hp:
-            return await ctx.send(
-                f'Please enter an amount of HP.\nEX: {self.bot.command_prefix}magic 32000000 <spell attack> <args>')
-        elif not spellatk:
-            return await ctx.send(
-                f'Please enter an amount of Spell Attack.\nEX: {self.bot.command_prefix}magic <hp> 570 <args>')
-        else:
-            try:
-                hp = int(hp)
-                spellatk = int(spellatk)
-            except ValueError:
-                return await ctx.send(f'HP and Spell Attack values must be an integer.')
 
         modifiers_msg = f'Spell Attack: {spellatk}\n'
         modifier = 1.0 * spellatk
@@ -150,9 +149,14 @@ class Utility(commands.Cog):
             messageable=ctx.channel or ctx.author,
             author=ctx.author,
             fields=(('Modifiers', modifiers_msg),
-                    ('Magic Required', magic_msg)))
+                    ('Magic Required', magic_msg))
+        )
 
-    @commands.command(name='time', description='Displays the server time')
+    @commands.command(
+        name='time',
+        description='Displays the server time',
+        usage=''
+    )
     async def time_command(self, ctx):
         fmt_time = datetime.utcnow().strftime('%H:%M:%S, %d %b, %Y')
         return await self.bot.send_embed(f'The server\'s current time is {fmt_time} UTC-0.', '', ctx.channel or ctx.author, ctx.author)
