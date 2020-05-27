@@ -177,7 +177,7 @@ class Bot(commands.Bot):
         print('Command Processing started')
 
     async def send_embed(self, title: str, description: str, messageable: discord.abc.Messageable, author: discord.Member, *fields: Tuple[str, str]):
-        embed = discord.Embed(title=title, description=description)
+        embed = discord.Embed(title=title, description=description, color=discord.Color.purple())
         embed.set_author(name=f'{author}', icon_url=author.avatar_url)
         embed.set_footer(text='Send FAQ suggestions to your nearest staff member and everything else to thewallacems '
                               'on GitHub :)')
