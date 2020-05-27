@@ -1,12 +1,10 @@
-import math
 import re
 from datetime import datetime
 
 import discord
 import discord.utils
 from discord.ext import commands
-from sympy import Symbol
-from sympy.solvers import solve
+from windiautils import magiccalc
 
 import botcore
 
@@ -116,54 +114,43 @@ class Utility(commands.Cog):
                 return await ctx.send(f'HP and Spell Attack values must be an integer.')
 
         modifiers_msg = f'Spell Attack: {spellatk}\n'
-
-        staff = 1.0
-        elemental = 1.0
-        mastery = 0.6
+        modifier = 1.0 * spellatk
 
         if args:
             if re.search(r'-[^l]*([ls])[^l]*', args):  # loveless or elemental staff
-                staff = 1.25
-                modifiers_msg += f'Staff Multiplier: {staff}x\n'
+                modifier *= 1.25
+                modifiers_msg += f'Staff Multiplier: 1.25x\n'
             if re.search(r'-[^e]*e[^e]*', args):  # elemental advantage
-                elemental = 1.5
-                modifiers_msg += f'Elemental Advantage: {elemental}x\n'
+                modifier *= 1.5
+                modifiers_msg += f'Elemental Advantage: 1.50x\n'
             elif re.search(r'-[^d]*d[^d]*', args):  # elemental disadvantage
-                elemental = 0.5
-                modifiers_msg += f'Elemental Disadvantage: {elemental}x\n'
+                modifier *= 0.5
+                modifiers_msg += f'Elemental Disadvantage: 0.50x\n'
 
-        x = Symbol('x')
         magic_msg = ''
 
         if args and re.search(r'-[^a]*a[^a]*', args):  # elemental amp
-            modifiers_msg += f'BW Elemental Amp: 1.3x\n'
-            modifiers_msg += f'FP/IL Elemental Amp: 1.4x\n\n'
+            modifiers_msg += f'BW Elemental Amp: 1.30x\n'
+            modifiers_msg += f'FP/IL Elemental Amp: 1.40x\n\n'
 
             # F/P and I/L
-            amp = 1.4
-            solution = solve(((((((((
-                                            x ** 2) / 1000.0 + x * mastery * 0.9) / 30.0 + x / 200.0)) * spellatk) * amp) * staff) * elemental) / hp - 1.0,
-                             x)
-            fpil_magic = min([math.ceil(num) for num in solution if num >= 0.0])
+            fpil_magic = magiccalc.calc_magic(monster_hp=hp, modifier=modifier*1.4)
             magic_msg += f'Magic for F/P or I/L: {fpil_magic}\n'
 
             # BW
-            amp = 1.3
-            solution = solve(((((((((
-                                            x ** 2) / 1000.0 + x * mastery * 0.9) / 30.0 + x / 200.0)) * spellatk) * amp) * staff) * elemental) / hp - 1.0,
-                             x)
-            bw_magic = min([math.ceil(num) for num in solution if num >= 0.0])
+            bw_magic = magiccalc.calc_magic(monster_hp=hp, modifier=modifier*1.3)
             magic_msg += f'Magic for BW: {bw_magic}'
         else:
-            solution = solve((((((((
-                                           x ** 2) / 1000.0 + x * mastery * 0.9) / 30.0 + x / 200.0)) * spellatk) * staff) * elemental) / hp - 1.0,
-                             x)
-            magic = min([math.ceil(num) for num in solution if num >= 0.0])
+            magic = magiccalc.calc_magic(monster_hp=hp, modifier=modifier)
             magic_msg += f'\nMagic: {magic}'
 
-        return await self.bot.send_embed('Magic Calculator', f'The Magic required to one-hit a monster with {hp} HP', ctx.channel or ctx.author, ctx.author,
-                                         ('Modifiers', modifiers_msg),
-                                         ('Magic Required', magic_msg))
+        return await self.bot.send_embed(
+            title='Magic Calculator',
+            description=f'The Magic required to one-hit a monster with {hp} HP',
+            messageable=ctx.channel or ctx.author,
+            author=ctx.author,
+            fields=(('Modifiers', modifiers_msg),
+                    ('Magic Required', magic_msg)))
 
     @commands.command(name='time', description='Displays the server time')
     async def time_command(self, ctx):
