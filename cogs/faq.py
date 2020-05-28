@@ -248,15 +248,13 @@ class FAQ(commands.Cog):
                 # means the command was invoked in a DM channel
                 return await self.bot.send_embed(command, self.faq_commands[command], author, author)
 
-            elif bot_channel := guild.get_channel(708715939486498937):
+            bot_channel_id = await self.bot.config.aiogetint('Bot', 'Channel')
+            if bot_channel := guild.get_channel(bot_channel_id):
                 if not any((channel.id == bot_channel.id, bot_channel.permissions_for(author).manage_messages)):
                     # the command was attempted to be invoked by a non-mod in some channel besides the bot channel
                     raise commands.CheckFailure
 
-                return await self.bot.send_embed(command, self.faq_commands[command], channel, author)
-
-            else:
-                return await self.bot.send_embed(command, self.faq_commands[command], channel, author)
+            return await self.bot.send_embed(command, self.faq_commands[command], channel, author)
 
 
 def setup(bot):

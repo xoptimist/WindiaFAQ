@@ -12,30 +12,16 @@ import traceback
 
 import discord.errors
 from discord.ext import commands
-from dotenv import load_dotenv
 
 from botcore import Bot
+from windiautils import Config
 
-if not os.path.exists('./.env'):
-    print('No .env file could be found!')
-    print('Please create a .env file, place it in the main directory, and format it like this:')
-    print('\tTOKEN = \'<INSERT TOKEN HERE>\'')
-    print('\tPREFIX = \'<INSERT PREFIX HERE>\'')
-    sys.exit(0)
+config = Config.getInstance()
+prefix = config.get('Bot', 'Prefix')
+token = config.get('Bot/Secrets', 'Token')
 
-load_dotenv()
-
-prefix = os.getenv('PREFIX', None)
-token = os.getenv('TOKEN', None)
-
-if not prefix or prefix == '':
-    print('No prefix set in the .env file. Please set a prefix to use this bot.')
-    print('EX: PREFIX = \'PREFIX\'')
-    sys.exit(0)
-
-if not token or token == '':
-    print('No token set in the .env file. Please set a token to use this bot.')
-    print('EX: TOKEN = \'TOKEN\'')
+if not token:
+    print('No token set in the configuration file. Please set a token to use this bot.')
     sys.exit(0)
 
 bot = Bot(prefix)
@@ -53,7 +39,7 @@ if os.path.exists(cogs_path):
             print(f'{cog} not found.')
         except commands.NoEntryPointError:
             print(f'{cog} has no setup function.')
-        except:
+        except Exception:
             print(f'An unhandled error was thrown while loading {cog}')
             traceback.print_exc()
             continue
@@ -61,9 +47,9 @@ if os.path.exists(cogs_path):
 try:
     bot.run(token, reconnect=True)
 except discord.errors.LoginFailure:
-    print('An improper token was passed. Please enter a valid token into the .env file.')
+    print('An improper token was passed. Please enter a valid token into the configuration file.')
     sys.exit(0)
-except:
+except Exception:
     print('An unhandled error was thrown while logging into Discord.')
     traceback.print_exc()
     sys.exit(0)

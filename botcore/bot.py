@@ -1,11 +1,10 @@
-import asyncio
 import re
-import traceback
+from typing import Tuple
 
 import discord.utils
-from discord.ext import tasks, commands
+from discord.ext import commands
 
-from typing import Tuple
+import windiautils
 
 
 class Bot(commands.Bot):
@@ -50,7 +49,7 @@ class Bot(commands.Bot):
             A list of commands queued by the bot to process and output to the user
         """
 
-        self.queued_commands = list()
+        self.config = windiautils.Config.getInstance()
         super().__init__(command_prefix, help_command=None)
 
     async def on_ready(self):
@@ -72,8 +71,8 @@ class Bot(commands.Bot):
         Bot receives a message. This is used for attempting to parse the message 
         for a command. If the message is sent by a bot, it is ignored. If the message 
         begins with the command prefix, it is then tested for membership in the bot's 
-        stored commands. If it passes, then the message is queued to be processed 
-        by the bot as a command, otherwise it is ignored.
+        stored commands. If it passes, then the message is processed by a bot as a
+        command.
         
         Parameters
         ----------
@@ -89,14 +88,11 @@ class Bot(commands.Bot):
             command = raw_command[0]
 
             if self.get_command(command):
-                task = asyncio.create_task(self.process_commands(message))
-                self.queued_commands.append(task)
-                if not self.dequeue_commands.get_task():
-                    self.dequeue_commands.start()
+                await self.process_commands(message)
 
     async def log(self, event: str, *messages: Tuple[str, str]):
-        # add config to this bot later (: just copy pasted from my other bot
-        if channel := self.get_channel(714581563022770218):
+        logging_channel_id = await self.config.aiogetint('Logging', 'Channel')
+        if channel := self.get_channel(logging_channel_id):
             embed = discord.Embed(title=event, description='', color=discord.Color.purple())
 
             for name, value in messages:
@@ -112,37 +108,6 @@ class Bot(commands.Bot):
                 print(f'{name}: {value}')
 
             print('----------------------------------')
-
-    @tasks.loop(seconds=1/2)
-    async def dequeue_commands(self):
-        """A loop to process commands from the bot's guild members
-
-        await dequeue_commands()
-
-        This is a coroutine. This event is not called directly; rather the
-        loop is initialized by calling dequeue_commands.start(). This loop
-        serves to dequeue and process all commands that the bot has stored 
-        from the users of its guilds. This is a First-In-First-Out process.
-        """
-
-        if len(self.queued_commands) > 0:
-            await self.queued_commands.pop(0)
-        else:
-            self.dequeue_commands.cancel()
-
-    @dequeue_commands.before_loop
-    async def before_dequeue_commands(self):
-        """An event fired once before the dequeue commands loop starts
-
-        await before_dequeue_commands()
-        
-        This is a coroutine. This event is not called directly; it is fired before 
-        the dequeue_commands loop starts. This is used to do any extraneous setup 
-        before the bot initializes command processing.
-        """
-
-        await self.wait_until_ready()
-        print('Command Processing started')
 
     async def send_embed(self, title: str, description: str, messageable: discord.abc.Messageable, author: discord.Member, fields: Tuple[Tuple[str, str]] = tuple()):
         embed = discord.Embed(title=title, description=description, color=discord.Color.purple())

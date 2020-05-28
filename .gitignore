@@ -6,6 +6,7 @@
 # Windia FAQ-specific files
 *.env
 *.json
+*.ini
 
 # Python-specific files
 env/
