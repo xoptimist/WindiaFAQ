@@ -109,7 +109,7 @@ class Config:
         >     [Subsection]
         >         Key = value
 
-        >>> config = Config.getInstance()
+        >>> config = Config
         >>> value = config.get('Section/Subsection', 'Key')
         """
 
@@ -160,9 +160,9 @@ class Config:
         >     [Subsection]
         >         Key = value
 
-        >>> config = Config.getInstance()
-        >>> config.set('Section', 'TR3YWAY', False)
-        >>> config.set('Section/Subsection', 'Key', 'new value')
+        >>> config = Config
+        >>> config.set_command('Section', 'TR3YWAY', False)
+        >>> config.set_command('Section/Subsection', 'Key', 'new value')
         """
 
         sections = section.split('/')

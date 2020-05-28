@@ -1,5 +1,3 @@
-import difflib
-
 import discord
 from discord.ext import commands
 
@@ -49,7 +47,6 @@ class FAQ(commands.Cog):
         """
 
         self.bot: botcore.Bot = bot
-        self.faq_commands: dict = windiautils.load_commands()
 
     @commands.command(
         name='add',
@@ -78,12 +75,11 @@ class FAQ(commands.Cog):
             The description for the given FAQ command
         """
 
-        if command in self.faq_commands or self.bot.get_command(command):
-            return await ctx.send(f'{command} is already a registered command.')
+        if await windiautils.add_command(command.lower(), description):
+            return await ctx.send(f'{command} was added successfully.')
+        else:
+            return await ctx.send(f'{command} already exists.')
 
-        self.faq_commands[command.lower()] = description
-        windiautils.save_commands(self.faq_commands)
-        return await ctx.send(f'{command} was added.')
 
     @commands.command(
         name='update',
@@ -112,12 +108,10 @@ class FAQ(commands.Cog):
             The new description for the given FAQ command
         """
 
-        if command not in self.faq_commands:
-            return await ctx.send(f'{command} is not a registered command.')
-
-        self.faq_commands[command.lower()] = description
-        windiautils.save_commands(self.faq_commands)
-        return await ctx.send(f'{command} was updated.')
+        if await windiautils.update_command(command.lower(), description):
+            return await ctx.send(f'{command} was updated successfully.')
+        else:
+            return await ctx.send(f'{command} does not exist.')
 
     @commands.command(
         name='alias',
@@ -146,14 +140,15 @@ class FAQ(commands.Cog):
             The new alias for the given FAQ command
         """
 
-        if command not in self.faq_commands:
-            return await ctx.send(f'{command} is not a registered command.')
-        elif alias in self.faq_commands:
-            return await ctx.send(f'{alias} is already a registered command.')
+        if (existing := await windiautils.get_command(command.lower())) and not windiautils.get_command(alias.lower()):
+            await windiautils.add_command(alias.lower(), existing)
+            return await ctx.send(f'The alias {alias} has been added to {command}.')
 
-        self.faq_commands[alias.lower()] = self.faq_commands[command]
-        windiautils.save_commands(self.faq_commands)
-        return await ctx.send(f'The alias {alias} has been added to {command}.')
+        else:
+            if not existing:
+                return await ctx.send(f'{command} is not a command.')
+            else:
+                return await ctx.send(f'{alias} is already a command.')
 
     @commands.command(
         name='remove',
@@ -179,14 +174,16 @@ class FAQ(commands.Cog):
             The FAQ command to be removed
         """
 
-        if command not in self.faq_commands:
-            return await ctx.send(f'{command} is not a registered command.')
+        if await windiautils.delete_command(command.lower()):
+            return await ctx.send(f'{command} was removed.')
+        else:
+            return await ctx.send(f'{command} is not a command.')
 
-        self.faq_commands.pop(command)
-        windiautils.save_commands(self.faq_commands)
-        return await ctx.send(f'{command} was removed.')
+    async def cog_before_invoke(self, ctx):
+        if not await windiautils.database_exists():
+            await windiautils.create_database()
 
-    def cog_check(self, ctx: commands.Context):
+    async def cog_check(self, ctx: commands.Context):
         """Checks if the user attempting to invoke an admin command has the manage_message permission
         
         self.cog_check(ctx: discord.ext.commands.Context)
@@ -201,6 +198,10 @@ class FAQ(commands.Cog):
         ctx: discord.ext.commands.Context
             The context of the message sent by the user received by the bot
         """
+
+        if not await windiautils.database_exists():
+            await ctx.send(f'There is currently an issue obtaining FAQ commands. Sorry!')
+            return False
 
         return ctx.channel.permissions_for(ctx.author).manage_messages
 
@@ -239,22 +240,18 @@ class FAQ(commands.Cog):
             guild = message.guild
             author = message.author
 
-            output = await windiautils.process_faq_command(command)
-            if not output:
-                # no FAQ command was found that matched or was close to matching `command`
-                return
+            if (output := await windiautils.get_command(command.lower())) and await windiautils.database_exists():
+                if not guild:
+                    # means the command was invoked in a DM channel
+                    return await self.bot.send_embed(command, output, author, author)
 
-            if not guild:
-                # means the command was invoked in a DM channel
-                return await self.bot.send_embed(command, self.faq_commands[command], author, author)
+                bot_channel_id = await self.bot.config.aiogetint('Bot', 'Channel')
+                if bot_channel := guild.get_channel(bot_channel_id):
+                    if not any((channel.id == bot_channel.id, bot_channel.permissions_for(author).manage_messages)):
+                        # the command was attempted to be invoked by a non-mod in some channel besides the bot channel
+                        raise commands.CheckFailure
 
-            bot_channel_id = await self.bot.config.aiogetint('Bot', 'Channel')
-            if bot_channel := guild.get_channel(bot_channel_id):
-                if not any((channel.id == bot_channel.id, bot_channel.permissions_for(author).manage_messages)):
-                    # the command was attempted to be invoked by a non-mod in some channel besides the bot channel
-                    raise commands.CheckFailure
-
-            return await self.bot.send_embed(command, self.faq_commands[command], channel, author)
+                return await self.bot.send_embed(command, output, channel, author)
 
 
 def setup(bot):

@@ -1,4 +1,3 @@
-from .commandloader import save_commands, load_commands
-from .faqprocessor import process_faq_command
+from .faqprocessor import *
 from .magiccalc import calc_magic
 from .config import *
