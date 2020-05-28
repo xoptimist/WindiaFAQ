@@ -97,7 +97,7 @@ class Utility(commands.Cog):
         description='Shows how much magic needed to one shot a monster',
         usage='`monster hp: integer` `spell attack: integer` `args: -[alsed]`'
     )
-    async def magic_command(self, ctx, hp: int, spellatk: int, *, args=None):
+    async def magic_command(self, ctx, hp: int = None, spellatk: int = None, *, args = None):
         if not hp and not spellatk and not args:
             message = (
                 f'Usage: {self.bot.command_prefix}{ctx.invoked_with} <hp> <spell attack> <args>\n'
