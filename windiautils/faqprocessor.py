@@ -18,7 +18,7 @@ async def get_nearest_match(connection: aiosqlite.Connection, command: str):
         # produces too many matches with only 2 characters in a command so ignore this
         async with connection.execute(" SELECT * FROM commands; ") as cursor:
             async for row in cursor:
-                if is_nearest_match(command, row['command']):
+                if await is_nearest_match(command, row['command']):
                     nearest_matches.append(row['command'])
 
     return nearest_matches
