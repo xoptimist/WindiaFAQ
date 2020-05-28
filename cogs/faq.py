@@ -239,39 +239,24 @@ class FAQ(commands.Cog):
             guild = message.guild
             author = message.author
 
+            output = await windiautils.process_faq_command(command)
+            if not output:
+                # no FAQ command was found that matched or was close to matching `command`
+                return
+
             if not guild:
-                return await self.process_faq_command(command, author, author)
+                # means the command was invoked in a DM channel
+                return await self.bot.send_embed(command, self.faq_commands[command], author, author)
 
-            elif not (bot_channel := guild.get_channel(708715939486498937)):
-                return await self.process_faq_command(command, channel, author)
+            elif bot_channel := guild.get_channel(708715939486498937):
+                if not any((channel.id == bot_channel.id, bot_channel.permissions_for(author).manage_messages)):
+                    # the command was attempted to be invoked by a non-mod in some channel besides the bot channel
+                    raise commands.CheckFailure
 
-            if not any((channel.id == bot_channel.id, bot_channel.permissions_for(author).manage_messages)):
-                # the command was attempted to be invoked by a non-mod in some channel besides the bot channel
-                return await channel.send(f'Please use this command in the bot channel, {author.mention}.',
-                                          delete_after=5.0)
+                return await self.bot.send_embed(command, self.faq_commands[command], channel, author)
 
-            return await self.process_faq_command(command, channel, author)
-
-    async def process_faq_command(self, command: str, messageable: discord.abc.Messageable, author: discord.Member):
-        if command in self.faq_commands:
-            return await self.bot.send_embed(command, self.faq_commands[command], messageable, author)
-        elif command not in self.faq_commands:
-            closest_commands = await self.get_closest_commands(command)
-            if len(closest_commands) > 0:
-                cmds = ', '.join([f'**{command}**' for command in closest_commands])
-                return await messageable.send(f'Did you mean... {cmds}?')
-
-    async def get_closest_commands(self, cmd: str):
-        if len(cmd) < 2:
-            return []
-
-        def __get_closest_commands():
-            all_commands = list(self.faq_commands.keys()) + [command.name for command in list(self.bot.commands)]
-            return [command for command in all_commands if
-                    cmd in command or difflib.SequenceMatcher(None, cmd, command).ratio() > min(0.8,
-                                                                                                1.0 - 1 / len(cmd))]
-
-        return await self.bot.loop.run_in_executor(None, __get_closest_commands)
+            else:
+                return await self.bot.send_embed(command, self.faq_commands[command], channel, author)
 
 
 def setup(bot):
