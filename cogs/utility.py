@@ -116,7 +116,7 @@ class Utility(commands.Cog):
         modifier = 1.0 * spellatk
 
         if args:
-            if re.search(r'-[^l]*([ls])[^l]*', args):  # loveless or elemental staff
+            if re.search(r'-[^ls]*[ls][^ls]*', args):  # loveless or elemental staff
                 modifier *= 1.25
                 modifiers_msg += f'Staff Multiplier: 1.25x\n'
             if re.search(r'-[^e]*e[^e]*', args):  # elemental advantage
