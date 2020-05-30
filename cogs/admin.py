@@ -45,105 +45,60 @@ class Admin(commands.Cog):
 
         self.bot: botcore.Bot = bot
 
-    @commands.command(name='reload', hidden=True)
+    @commands.command(
+        name='reload',
+        usage='`cog: str`',
+        description='Reloads a cog',
+        hidden=True
+    )
     async def reload_cog(self, ctx: commands.Context, cog: str):
-        """Attempts to reload a cog
-        
-        await reload(ctx: discord.ext.commands.Context,
-                         cog: str)
-
-        This is a coroutine. This is not called directly; it is called whenever
-        a user attempts to use the command `$reload`. If the cog_check passes,
-        this command will attempt to reload the given cog. 
-
-        Parameters
-        ----------
-        ctx: discord.ext.commands.Context
-            The context of the command sent by the user
-
-        cog: str
-            The name of the cog being reloaded. This is the name of the Python
-            file that the user is attempting to reload. It can either be in the
-            form cogs.{file_name} or just {file_name}.
-        """
-
         cog = (cog if cog.startswith('cogs.') else f'cogs.{cog}').lower()
 
         try:
             self.bot.reload_extension(cog)
-            await ctx.send(f'{cog} reloaded succesfully.')
+            return await ctx.send(f'{cog} reloaded successfully.')
         except commands.ExtensionNotLoaded:
-            await ctx.send(f'{cog} not loaded.')
+            return await ctx.send(f'{cog} not loaded.')
         except commands.ExtensionAlreadyLoaded:
-            await ctx.send(f'{cog} is already loaded.')
+            return await ctx.send(f'{cog} is already loaded.')
         except commands.ExtensionNotFound:
-            await ctx.send(f'{cog} not found.')
+            return await ctx.send(f'{cog} not found.')
         except commands.NoEntryPointError:
-            await ctx.send(f'{cog} has no setup function.')
+            return await ctx.send(f'{cog} has no setup function.')
 
-    @commands.command(name='load', hidden=True)
-    async def load_cog(self, ctx: commands.Context, cog: str):
-        """Attempts to load a cog
-        
-        await load(ctx: discord.ext.commands.Context,
-                         cog: str)
-
-        This is a coroutine. This is not called directly; it is called whenever
-        a user attempts to use the command `$load`. If the cog_check passes,
-        this command will attempt to load the given cog. 
-
-        Parameters
-        ----------
-        ctx: discord.ext.commands.Context
-            The context of the command sent by the user
-
-        cog: str
-            The name of the cog being loaded. This is the name of the Python
-            file that the user is attempting to load. It can either be in the
-            form cogs.{file_name} or just {file_name}.
-        """
-
+    @commands.command(
+        name='load',
+        usage='`cog: str`',
+        description='Loads a cog',
+        hidden=True
+    )
+    async def load(self, ctx: commands.Context, cog: str):
         cog = (cog if cog.startswith('cogs.') else f'cogs.{cog}').lower()
 
         try:
             self.bot.load_extension(cog)
-            await ctx.send(f'{cog} loaded successfully.')
+            return await ctx.send(f'{cog} loaded successfully.')
         except commands.ExtensionAlreadyLoaded:
-            await ctx.send(f'{cog} is already loaded.')
+            return await ctx.send(f'{cog} is already loaded.')
         except commands.ExtensionNotFound:
-            await ctx.send(f'{cog} not found.')
+            return await ctx.send(f'{cog} not found.')
         except commands.NoEntryPointError:
-            await ctx.send(f'{cog} has no setup function.')
+            return await ctx.send(f'{cog} has no setup function.')
 
-    @commands.command(name='unload', hidden=True)
-    async def unload_cog(self, ctx: commands.Context, cog: str):
-        """Attempts to unload a cog
-        
-        await unload_cog(ctx: discord.ext.commands.Context,
-                         cog: str)
-
-        This is a coroutine. This is not called directly; it is called whenever
-        a user attempts to use the command `$unload`. If the cog_check passes,
-        this command will attempt to unload the given cog. 
-
-        Parameters
-        ----------
-        ctx: discord.ext.commands.Context
-            The context of the command sent by the user
-
-        cog: str
-            The name of the cog being unloaded. This is the name of the Python
-            file that the user is attempting to unload. It can either be in the
-            form cogs.{file_name} or just {file_name}.
-        """
-
+    @commands.command(
+        name='unload',
+        usage='`cog: str`',
+        description='Unloads a cog',
+        hidden=True
+    )
+    async def unload(self, ctx: commands.Context, cog: str):
         cog = (cog if cog.startswith('cogs.') else f'cogs.{cog}').lower()
 
         try:
             self.bot.unload_extension(cog)
-            await ctx.send(f'{cog} unloaded successfully.')
+            return await ctx.send(f'{cog} unloaded successfully.')
         except commands.ExtensionNotLoaded:
-            await ctx.send(f'{cog} not loaded.')
+            return await ctx.send(f'{cog} not loaded.')
 
     @commands.command(name='restart', hidden=True)
     async def restart(self, ctx: commands.Context):
