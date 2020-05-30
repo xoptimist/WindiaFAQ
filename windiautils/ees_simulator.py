@@ -33,20 +33,18 @@ def attempt_ees(start, end, protect_delta):
     sfprot_used = 0
     level = start
     while level < end:
-        pre_lvl = level
         level, sfprot = enhance(level, protect_delta)
-        # print(f"1 EES went from {pre_lvl}* to {level}*")
         attempts += 1
         sfprot_used += sfprot
     return (attempts, sfprot_used)
 
 
-def sample(args):
+def sample(ees, protect_delta, samples):
     results = []
-    start, end = map(int, args.ees.split('-'))
-    print(f'Running simulation of EES from {start}* to {end}* {args.samples} times...')
-    for i in range(args.samples):
-        results.append(attempt_ees(start, end, args.protect_delta))
+    start, end = map(int, ees.split('-'))
+    print(f'Running simulation of EES from {start}* to {end}* {samples} times...')
+    for i in range(samples):
+        results.append(attempt_ees(start, end, protect_delta))
     
     avg = sum([r[0] for r in results]) / len([r[0] for r in results])
     sfavg = sum([r[1] for r in results]) / len([r[1] for r in results])
@@ -62,10 +60,10 @@ def sample(args):
         'sfprot_average': sfavg,
         'sfprot_min': sf_min,
         'sfprot_max': sf_max,
-        'description': f"Took {avg} EES w/ {sfavg} SF protects on average over {args.samples} samples to go from {start}* to {end}*.",
+        'description': f"Took {avg} EES w/ {sfavg} SF protects on average over {samples} samples to go from {start}* to {end}*.",
     }
 
 
 if __name__ == '__main__':
     args = parse_args()
-    print(sample(args).get('description'))
+    print(sample(args.ees, args.protect_delta, args.samples).get('description'))
