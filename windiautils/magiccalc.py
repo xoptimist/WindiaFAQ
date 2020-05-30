@@ -3,6 +3,8 @@ from sympy.solvers import solve
 
 import math
 
+__all__ = ['calc_magic']
+
 
 def calc_magic(monster_hp: int, modifier: float = 1.0):
     x = Symbol('x')

@@ -63,7 +63,8 @@ Utility Commands
         for command in self.bot.walk_commands():
             # Don't show users the hidden commands
             if command.hidden:
-                continue
+                if ctx.channel and not ctx.channel.permissions_for(ctx.author).manage_messages:
+                    continue
 
             # Check for a number below 2000 so the message doesn't go over 2000 characters
             if len(help) > 1900:
@@ -77,12 +78,13 @@ FAQ Commands
 ------------
 '''
 
-        for command, _ in windiautils.load_commands().items():
-            if len(help) > 1900:
-                messages.append(help)
-                help = '\n'
+        if await windiautils.database_exists():
+            async for command in windiautils.iter_commands():
+                if len(help) > 1900:
+                    messages.append(help)
+                    help = '\n'
 
-            help += f'{command} | '
+                help += f'{command} | '
 
         help += '```'
 

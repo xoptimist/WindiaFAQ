@@ -1,3 +1,4 @@
 from .faqprocessor import *
-from .magiccalc import calc_magic
+from .magiccalc import *
 from .config import *
+from .discordutils import *

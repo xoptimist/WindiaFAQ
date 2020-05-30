@@ -1,4 +1,3 @@
-import re
 from typing import Tuple
 
 import discord.utils
@@ -55,12 +54,13 @@ class Bot(commands.Bot):
     async def log(self, event: str, *messages: Tuple[str, str]):
         logging_channel_id = await self.config.aiogetint('Logging', 'Channel')
         if channel := self.get_channel(logging_channel_id):
-            embed = discord.Embed(title=event, description='', color=discord.Color.purple())
-
-            for name, value in messages:
-                embed.add_field(name=name, value=value)
-
-            return await channel.send(embed=embed)
+            return await windiautils.send_embed(
+                title=event,
+                description='',
+                messageable=channel,
+                author=self.user,
+                fields=messages
+            )
         else:
             print()
             print('----------------------------------')
@@ -70,17 +70,3 @@ class Bot(commands.Bot):
                 print(f'{name}: {value}')
 
             print('----------------------------------')
-
-    async def send_embed(self, title: str, description: str, messageable: discord.abc.Messageable, author: discord.Member, fields: Tuple[Tuple[str, str]] = tuple()):
-        embed = discord.Embed(title=title, description=description, color=discord.Color.purple())
-        embed.set_author(name=f'{author}', icon_url=author.avatar_url)
-        embed.set_footer(text='Send FAQ suggestions to your nearest staff member and everything else to wallace05#0828 :)')
-
-        # embed any first image url found in the description
-        if match := re.match(r'(https[^\s]+\.(jpe?g|png))', description):
-            embed.set_image(url=match.group(0))
-
-        for name, value in fields:
-            embed.add_field(name=name, value=value)
-
-        return await messageable.send(embed=embed)

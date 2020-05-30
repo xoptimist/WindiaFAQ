@@ -3,7 +3,7 @@ import aiosqlite
 
 import os.path
 
-__all__ = ['create_database', 'database_exists', 'add_command', 'get_command', 'update_command', 'delete_command']
+__all__ = ['iter_commands', 'create_database', 'database_exists', 'create_command', 'get_command', 'update_command', 'delete_command']
 
 
 async def is_nearest_match(command, faq_command):
@@ -37,7 +37,7 @@ async def database_exists():
     return os.path.exists(__commands_file)
 
 
-async def add_command(command: str, value: str):
+async def create_command(command: str, value: str):
     async with aiosqlite.connect(__commands_file) as db:
         db.row_factory = aiosqlite.Row
         async with db.execute(" SELECT * FROM commands WHERE command = ?; ", (command, )) as cursor:
@@ -86,3 +86,10 @@ async def delete_command(command: str):
             else:
                 return False
 
+
+async def iter_commands():
+    async with aiosqlite.connect(__commands_file) as db:
+        db.row_factory = aiosqlite.Row
+        async with db.execute(" SELECT * FROM commands; ") as cursor:
+            async for row in cursor:
+                yield row['command']

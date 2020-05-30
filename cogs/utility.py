@@ -4,9 +4,9 @@ from datetime import datetime
 import discord
 import discord.utils
 from discord.ext import commands
-from windiautils import calc_magic
 
 import botcore
+import windiautils
 
 
 class Utility(commands.Cog):
@@ -53,12 +53,12 @@ class Utility(commands.Cog):
         member = member or ctx.author
         messageable = ctx.channel or ctx.author
 
-        return await self.bot.send_embed(
-            f'{member.display_name}\'s Discord ID: {member.id}',
-            f'Type `@discord` in game and then enter this ID into the text box '
-            f'to link your in-game account to your Discord account.',
-            messageable,
-            ctx.author
+        return await windiautils.send_embed(
+            title=f'{member.display_name}\'s Discord ID: {member.id}',
+            description=f'Type `@discord` in game and then enter this ID into the text box '
+                        f'to link your in-game account to your Discord account.',
+            messageable=messageable,
+            author=ctx.author
         )
 
     @commands.command(
@@ -89,7 +89,12 @@ class Utility(commands.Cog):
             else:
                 message = f'The server is currently **online** with {online_count} players.'
 
-        return await self.bot.send_embed('Is Windia online?', message, ctx.channel, ctx.author)
+        return await windiautils.send_embed(
+            title=message,
+            description='',
+            messageable=ctx.channel,
+            author=ctx.author
+        )
 
     # REMINDER: Check the flags repo
     @commands.command(
@@ -110,7 +115,12 @@ class Utility(commands.Cog):
                 f'Example Usage: {self.bot.command_prefix}magic 43376970 570 -asle'
             )
 
-            return await self.bot.send_embed('Magic Usage', message, ctx.channel or ctx.author, ctx.author)
+            return await windiautils.send_embed(
+                title='Magic Usage',
+                description=message,
+                messageable=ctx.channel or ctx.author,
+                author=ctx.author
+            )
 
         modifiers_msg = f'Spell Attack: {spellatk}\n'
         modifier = 1.0 * spellatk
@@ -133,17 +143,17 @@ class Utility(commands.Cog):
             modifiers_msg += f'FP/IL Elemental Amp: 1.40x\n\n'
 
             # F/P and I/L
-            fpil_magic = calc_magic(monster_hp=hp, modifier=modifier*1.4)
+            fpil_magic = windiautils.calc_magic(monster_hp=hp, modifier=modifier*1.4)
             magic_msg += f'Magic for F/P or I/L: {fpil_magic}\n'
 
             # BW
-            bw_magic = calc_magic(monster_hp=hp, modifier=modifier*1.3)
+            bw_magic = windiautils.calc_magic(monster_hp=hp, modifier=modifier*1.3)
             magic_msg += f'Magic for BW: {bw_magic}'
         else:
-            magic = calc_magic(monster_hp=hp, modifier=modifier)
+            magic = windiautils.calc_magic(monster_hp=hp, modifier=modifier)
             magic_msg += f'\nMagic: {magic}'
 
-        return await self.bot.send_embed(
+        return await windiautils.send_embed(
             title='Magic Calculator',
             description=f'The Magic required to one-hit a monster with {hp} HP',
             messageable=ctx.channel or ctx.author,
@@ -159,7 +169,12 @@ class Utility(commands.Cog):
     )
     async def time_command(self, ctx):
         fmt_time = datetime.utcnow().strftime('%H:%M:%S, %d %b, %Y')
-        return await self.bot.send_embed(f'The server\'s current time is {fmt_time} UTC-0.', '', ctx.channel or ctx.author, ctx.author)
+        return await windiautils.send_embed(
+            title=f'The server\'s current time is {fmt_time} UTC-0.',
+            description='',
+            messageable=ctx.channel or ctx.author,
+            author=ctx.author
+        )
 
     def cog_check(self, ctx):
         if ctx.guild and (bot_channel := ctx.guild.get_channel(708715939486498937)):

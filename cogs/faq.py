@@ -75,7 +75,7 @@ class FAQ(commands.Cog):
             The description for the given FAQ command
         """
 
-        if await windiautils.add_command(command.lower(), description):
+        if await windiautils.create_command(command.lower(), description):
             return await ctx.send(f'{command} was added successfully.')
         else:
             return await ctx.send(f'{command} already exists.')
@@ -141,7 +141,7 @@ class FAQ(commands.Cog):
         """
 
         if (existing := await windiautils.get_command(command.lower())) and not windiautils.get_command(alias.lower()):
-            await windiautils.add_command(alias.lower(), existing)
+            await windiautils.create_command(alias.lower(), existing)
             return await ctx.send(f'The alias {alias} has been added to {command}.')
 
         else:
@@ -180,18 +180,16 @@ class FAQ(commands.Cog):
             return await ctx.send(f'{command} is not a command.')
 
     async def cog_before_invoke(self, ctx):
+        """"""
+
         if not await windiautils.database_exists():
             await windiautils.create_database()
 
     async def cog_check(self, ctx: commands.Context):
         """Checks if the user attempting to invoke an admin command has the manage_message permission
-        
-        self.cog_check(ctx: discord.ext.commands.Context)
-        
-        This is a coroutine. This is not called directly; it is called whenever
-        a Cog command is sent by a user. This checks if the user sending any commands
-        in this cog has the manage_messages permissions. If this fails, then
-        the command is not processed.
+
+        Checks if the author has manage messages permission, which is enough to invoke
+        the CRUD commands for FAQ commands
 
         Parameters
         ----------
@@ -199,24 +197,11 @@ class FAQ(commands.Cog):
             The context of the message sent by the user received by the bot
         """
 
-        if not await windiautils.database_exists():
-            await ctx.send(f'There is currently an issue obtaining FAQ commands. Sorry!')
-            return False
-
         return ctx.channel.permissions_for(ctx.author).manage_messages
 
     @commands.Cog.listener('on_message')
     async def faq_check(self, message: discord.Message):
         """Check if the user is trying to invoke an faq_command
-6        
-        await faq_check(message: discord.Message)
-
-        This is a coroutine. This is not called directly. This event is
-        a listener for the Bot's on_message event and is called whenever
-        the on_message event is called. This event checks if the
-        user is attempting to call any command listed in the faq_commands
-        dictionary and sends the FAQ description of that command to the
-        context channel.
 
         FAQ commands are not handled like normal commands; rather they are
         just manually parsed through the message's content by checking
@@ -243,7 +228,12 @@ class FAQ(commands.Cog):
             if (output := await windiautils.get_command(command.lower())) and await windiautils.database_exists():
                 if not guild:
                     # means the command was invoked in a DM channel
-                    return await self.bot.send_embed(command, output, author, author)
+                    return await windiautils.send_embed(
+                        title=command,
+                        description=output,
+                        messageable=author,
+                        author=author
+                    )
 
                 bot_channel_id = await self.bot.config.aiogetint('Bot', 'Channel')
                 if bot_channel := guild.get_channel(bot_channel_id):
@@ -251,14 +241,13 @@ class FAQ(commands.Cog):
                         # the command was attempted to be invoked by a non-mod in some channel besides the bot channel
                         raise commands.CheckFailure(message='You do not have permission to invoke the FAQ command here.')
 
-                return await self.bot.send_embed(command, output, channel, author)
+                return await windiautils.send_embed(
+                    title=command,
+                    description=output,
+                    messageable=channel,
+                    author=author
+                )
 
 
 def setup(bot):
-    """Adds the cog to the Discord Bot
-    
-    This is not called directly; it is called when the Bot
-    called the load_extension function on a cog file path.
-    """
-
     bot.add_cog(FAQ(bot))
