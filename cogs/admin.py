@@ -100,25 +100,6 @@ class Admin(commands.Cog):
         except commands.ExtensionNotLoaded:
             return await ctx.send(f'{cog} not loaded.')
 
-    @commands.command(name='restart', hidden=True)
-    async def restart(self, ctx: commands.Context):
-        """Attempts to restart the bot
-        
-        await restart(ctx: discord.ext.commands.Context)
-
-        This is a coroutine. This is not called directly; it is called whenever
-        a user attempts to use the `restart` command. If this command passes the
-        cog check, the bot will restart.
-
-        Parameters
-        ----------
-        ctx: discord.ext.commands.Context
-            The context in which the command was sent
-        """
-
-        await ctx.send('Restarting')
-        await self.bot.close()
-
     def cog_check(self, ctx: commands.Context):
         """Checks if the user attempting to invoke any admin commands is the owner of the bot
         
