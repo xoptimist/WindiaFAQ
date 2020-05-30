@@ -8,47 +8,9 @@ import windiautils
 
 
 class Bot(commands.Bot):
-    """The Windia FAQ Bot base
-    Inherits from discord.ext.commands.Bot
-
-    Members
-    -------
-    queued_commands
-        A list of commands queued by the bot to process and output to the user
-    
-    Methods
-    -------
-    async def on_ready()
-        Alerts the user that the bot is initialized
-        
-    async def on_error(event: str, *args, **kwargs)
-        Prints unhandled errors to console
-
-    async def on_command_error(ctx: discord.ext.commands.Context,
-                               exception: discord.ext.commands.CommandError)
-        Prints unhandled command errors to console
-
-    async def on_message(message: discord.Message)
-        An event thrown when a user sends a message in the bot's guilds, used for command handling
-
-    async def dequeue_commands()
-        A loop to process commands from the bot's guild members
-
-    async def before_dequeue_commands()
-        An event fired once before the dequeue command loop starts
-    """
+    __slots__ = ['config']
 
     def __init__(self, command_prefix: str):
-        """The constructor for the Bot class
-
-        Bot(command_prefix: str)
-
-        Members
-        -------
-        queued_commands
-            A list of commands queued by the bot to process and output to the user
-        """
-
         self.config = windiautils.Config.getInstance()
         super().__init__(command_prefix, help_command=None)
 
@@ -112,8 +74,7 @@ class Bot(commands.Bot):
     async def send_embed(self, title: str, description: str, messageable: discord.abc.Messageable, author: discord.Member, fields: Tuple[Tuple[str, str]] = tuple()):
         embed = discord.Embed(title=title, description=description, color=discord.Color.purple())
         embed.set_author(name=f'{author}', icon_url=author.avatar_url)
-        embed.set_footer(text='Send FAQ suggestions to your nearest staff member and everything else to thewallacems '
-                              'on GitHub :)')
+        embed.set_footer(text='Send FAQ suggestions to your nearest staff member and everything else to wallace05#0828 :)')
 
         # embed any first image url found in the description
         if match := re.match(r'(https[^\s]+\.(jpe?g|png))', description):

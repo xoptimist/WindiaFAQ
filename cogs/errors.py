@@ -61,16 +61,17 @@ class ErrorsCog(commands.Cog):
                 f'**ERROR** {ctx.author.mention}, {error.converter} failed!'
             )
         else:
-            etype, value, tb = sys.exc_info()
+            etype = type(error)
+            etb = error.__traceback__
             await self.bot.log(
                 '**COMMAND ERROR**',
                 ('An unknown or unhandled error has occurred', type(error).__name__),
                 ('User Message', ctx.message.content),
-                ('Error Message', "".join(traceback.format_exception(etype, value, tb)))
+                ('Error Message', "".join(traceback.format_exception(etype, error, etb, 4)))
             )
 
             return await ctx.send(
-                f'**ERROR** An unknown or unhandled error has occurred processing this command.'
+                f'**ERROR** An unknown or unhandled error has occurred processing this command. {self.bot.owner_id}'
             )
 
     @commands.Cog.listener('on_error')
