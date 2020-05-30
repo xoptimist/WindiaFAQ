@@ -23,6 +23,9 @@ class Bot(commands.Bot):
 
         print(f'{self.user.name} connected.')
 
+        activity = discord.Activity(name='WindiaMS <3', type=discord.ActivityType.watching)
+        await self.change_presence(activity=activity)
+
     async def on_message(self, message: discord.Message):
         """An event thrown when a user sends a message in the bot's guilds, used for command handling.
 

@@ -53,7 +53,6 @@ class Help(commands.Cog):
         """
 
         messages = list()
-
         help = '''```Here is our list of commands
 
 Utility Commands
@@ -61,6 +60,9 @@ Utility Commands
 '''
 
         for command in self.bot.walk_commands():
+            if command.name == 'help':
+                continue
+
             # Don't show users the hidden commands
             if command.hidden:
                 if ctx.channel and not ctx.channel.permissions_for(ctx.author).manage_messages:

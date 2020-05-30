@@ -27,9 +27,6 @@ class Admin(commands.Cog):
     async def unload_cog(self, ctx: commands.Context, cog: str):
         Attempts to unload a cog
 
-    async def logout(self, ctx: commands.Context):
-        Attempts to logout of discord
-
     def cog_check(self, ctx: commands.Context):
         Checks if the user attempting to invoke any admin commands is the owner of the bot
     """
@@ -117,12 +114,6 @@ class Admin(commands.Cog):
         """
 
         return self.bot.is_owner(ctx.author)
-
-    @commands.command(name='pull', hidden=True)
-    async def update_bot(self, ctx):
-        """Updates the bot"""
-        await ctx.send('Updating')
-        os.system('git pull')
 
 
 def setup(bot):
