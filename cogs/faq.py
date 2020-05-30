@@ -249,7 +249,7 @@ class FAQ(commands.Cog):
                 if bot_channel := guild.get_channel(bot_channel_id):
                     if not any((channel.id == bot_channel.id, bot_channel.permissions_for(author).manage_messages)):
                         # the command was attempted to be invoked by a non-mod in some channel besides the bot channel
-                        raise commands.CheckFailure
+                        raise commands.CheckFailure(message='You do not have permission to invoke the FAQ command here.')
 
                 return await self.bot.send_embed(command, output, channel, author)
 
